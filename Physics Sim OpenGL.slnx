@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Physics Sim OpenGL.vcxproj" Id="2f002dca-27e1-490e-b440-a03010295dc5" />
+</Solution>

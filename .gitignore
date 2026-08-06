@@ -1,0 +1,25 @@
+# Visual Studio files
+.vs/
+*.user
+*.suo
+*.sln.docstates
+Debug/
+out/
+build/
+bin/
+obj/
+x64/
+*.exe
+*.dll
+*.pdb
+*.obj
+*.o
+
+!models/
+!models/*.obj
+!dependencies/
+!dependencies/lib/*.dll
+!dependencies/lib/*.lib
+
+.DS_Store
+Thumbs.db
