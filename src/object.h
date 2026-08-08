@@ -28,7 +28,7 @@ public:
 	void loadModel(const std::string& filepath);
 	void deleteModel();
 	void draw(unsigned int modelLocation) const;
-	void addPhysics();
+	void addPhysics(bool enableGravity = true, bool enableCollisions = true, bool isKinematic = false);
 	void removePhysics();
 private:
 	unsigned int VBO, VAO, EBO, vertexCount, indexCount;

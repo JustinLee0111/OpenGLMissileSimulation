@@ -11,8 +11,8 @@
 #include "shaders.h"
 #include "triangle_mesh.h"
 #include "object.h"
-#include "physicsEngine.h"
 #include "physics.h"
+#include "world.h"
 
 using namespace std;
 
@@ -20,7 +20,7 @@ int main() {
 	ifstream file;
 	stringstream bufferedLines;
 	string line;
-	physicsEngine physicsEngine;
+	World world;
 
     GLFWwindow* mainWindow;
 
@@ -30,11 +30,11 @@ int main() {
 	}
 
 	// Holds all objects in the world
-	vector<Object> worldObjects;
+	vector<unique_ptr<Object>> worldObjects;
 
 	// Camera setup
 	glm::mat4 view = glm::lookAt(
-		glm::vec3(0.0f, 0.0f, 10.0f), // Camera position
+		glm::vec3(0.0f, 5.0f, 20.0f), // Camera position
 		glm::vec3(0.0f, 0.0f, 0.0f), // Look at point
 		glm::vec3(0.0f, 1.0f, 0.0f)  // Up vector
 	);
@@ -44,8 +44,8 @@ int main() {
 
 	mainWindow = glfwCreateWindow(2880, 2160, "Physics Sim", nullptr, nullptr);
 	glfwMakeContextCurrent(mainWindow);
-	// VSYNC on
-	glfwSwapInterval(1);
+	
+	glfwSwapInterval(1);// VSYNC on
 
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		glfwTerminate();
@@ -56,12 +56,20 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	// Adds sphere object with physics enabled to worldObjects list
-	Object& sphere = worldObjects.emplace_back("models/sphere.obj");
-	sphere.position.y = 0.0f;
-	sphere.addPhysics();
-	//sphere.physics->enableGravity = false;
-	sphere.physics->gravity = -1.0f;
-	sphere.physics->velocity.z = -10.0f;
+	Object* sphere = world.spawnObject("models/sphere.obj", true);
+	sphere->position.y = 2.0f;
+	sphere->position.z = 5.0f;
+	sphere->physics->velocity.y = 0.0f;
+	sphere->physics->gravity = -9.81f;
+	sphere->physics->collider = BoundingBox::Sphere;
+	sphere->physics->restitution = 0.7f;
+
+	// Adds ground as a kinematic moving object
+	Object* ground = world.spawnObject("models/plane.obj", true, false, true, true);
+	ground->position.y = -1.0f;
+	ground->position.z = 5.0f;
+	ground->physics->collider = BoundingBox::Plane;
+	ground->physics->restitution = 1.0f;
 
 	//TriangleMesh* triangle = new TriangleMesh();
 
@@ -95,15 +103,14 @@ int main() {
 
 		accumulator += frameTime;
 
+		// Ensures physics simulation does fixed time steps
 		while (accumulator >= fixedDeltaTime) {
-			physicsEngine.update(worldObjects, fixedDeltaTime);
+			world.update(fixedDeltaTime);
 			accumulator -= fixedDeltaTime;
 		}
-
-		//model = glm::rotate(model, 5 * deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		sphere.draw(modelLocation);
+		world.draw(modelLocation);
 		glfwSwapBuffers(mainWindow);
 	}
 

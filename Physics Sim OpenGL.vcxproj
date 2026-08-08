@@ -131,6 +131,9 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(ProjectDir)dependencies\lib\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -153,6 +156,9 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <Manifest>
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
+    <PostBuildEvent>
+      <Command>xcopy /y /d "$(ProjectDir)dependencies\lib\*.dll" "$(OutDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\glad.c" />
@@ -162,6 +168,7 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <ClCompile Include="src\physicsEngine.cpp" />
     <ClCompile Include="src\shaders.cpp" />
     <ClCompile Include="src\triangle_mesh.cpp" />
+    <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\glad\glad.h" />
@@ -171,6 +178,7 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <ClInclude Include="src\shaders.h" />
     <ClInclude Include="src\staticHeaders.h" />
     <ClInclude Include="src\triangle_mesh.h" />
+    <ClInclude Include="src\world.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragment.frag" />

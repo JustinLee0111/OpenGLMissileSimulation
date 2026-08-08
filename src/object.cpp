@@ -138,16 +138,17 @@ void Object::loadModel(const std::string& filepath) {
 // Draws object using EBO
 void Object::draw(unsigned int modelLocation) const{
 	if (VAO == 0 || indexCount == 0) return;
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(glm::identity<glm::mat4>(), position);
 
-	glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), position);
 	glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
-
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 }
 
-void Object::addPhysics() {
-	if (!physics) physics = std::make_unique<Physics>();
+void Object::addPhysics(bool enablePhysics, bool enableCollisions, bool isKinematic) {
+	if (!physics) physics = std::make_unique<Physics>(enablePhysics, enableCollisions, isKinematic);
 }
 void Object::removePhysics() {
 	if (physics) physics = nullptr;
