@@ -29,9 +29,6 @@ int main() {
 		return -1;
 	}
 
-	// Holds all objects in the world
-	vector<unique_ptr<Object>> worldObjects;
-
 	// Camera setup
 	glm::mat4 view = glm::lookAt(
 		glm::vec3(0.0f, 5.0f, 20.0f), // Camera position
@@ -59,17 +56,16 @@ int main() {
 	Object* sphere = world.spawnObject("models/sphere.obj", true);
 	sphere->position.y = 2.0f;
 	sphere->position.z = 5.0f;
-	sphere->physics->velocity.y = 0.0f;
 	sphere->physics->gravity = -9.81f;
 	sphere->physics->collider = BoundingBox::Sphere;
-	sphere->physics->restitution = 0.7f;
+	sphere->physics->restitution = 0.25f;
 
 	// Adds ground as a kinematic moving object
 	Object* ground = world.spawnObject("models/plane.obj", true, false, true, true);
 	ground->position.y = -1.0f;
 	ground->position.z = 5.0f;
 	ground->physics->collider = BoundingBox::Plane;
-	ground->physics->restitution = 1.0f;
+	ground->physics->restitution = 0.5f;
 
 	//TriangleMesh* triangle = new TriangleMesh();
 
@@ -85,8 +81,8 @@ int main() {
 	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-	// Fixed physics rate to 60hz
-	const float fixedDeltaTime = 1.0f / 60.0f;
+	// Fixed physics rate of 60hz
+	const float fixedDeltaTime = world.getPhysicsRate();
 	float accumulator = 0.0f;
 	float lastFrame = (float)glfwGetTime();
 
@@ -103,7 +99,7 @@ int main() {
 
 		accumulator += frameTime;
 
-		// Ensures physics simulation does fixed time steps
+		// Ensures physics simulation does fixed time steps regardless of fps
 		while (accumulator >= fixedDeltaTime) {
 			world.update(fixedDeltaTime);
 			accumulator -= fixedDeltaTime;

@@ -14,20 +14,9 @@ public:
 	// All objects stored here
 	std::vector<std::unique_ptr<Object>> objects;
 
-	Object* spawnObject(const std::string& filepath, bool enablePhysics = false, bool enableGravity = true, bool enableCollisions = true, bool isKinematic = false) {
-		auto obj = std::make_unique<Object>(filepath);
-		Object* ptr = obj.get();
+	Object* spawnObject(const std::string& filepath, bool enablePhysics = false, bool enableGravity = true, bool enableCollisions = true, bool isKinematic = false);
 
-		if (enablePhysics) {
-			ptr->addPhysics(enableGravity, enableCollisions, isKinematic);
-			physicsEngine.addPhysObject(ptr);
-		}
-
-		objects.push_back(std::move(obj));
-		return ptr;
-	}
-
-	void update(float deltaTime) {
+	void update(const float deltaTime) {
 		physicsEngine.update(deltaTime);
 	}
 
@@ -48,5 +37,9 @@ public:
 	// Registers the object with physics engine
 	void createPhysObject(Object* obj) {
 		physicsEngine.addPhysObject(obj);
+	}
+
+	float getPhysicsRate() const{
+		return physicsEngine.getPhysicsRate();
 	}
 };

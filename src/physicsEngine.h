@@ -16,7 +16,13 @@ public:
 	}
 	// One of the objects is a plane
 	// TODO: implement other object on object collision
+	// TODO: implement mass collision calculations
 	// TODO: implement angled collisions
-	void planeCollision(Object* obj1, Object* obj2);
-	void checkCollisions();
+	void planeCollision(Object* obj1, Object* obj2, const float& deltaTime);
+	void checkCollisions(const float& deltaTime);
+	float getPhysicsRate() const {
+		return deltaTime;
+	}
+private:
+	const float deltaTime = (1.0f / 60.0f);
 };

@@ -11,17 +11,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "object.h"
-#include "physics.h"
-
-struct Vertex {
-	glm::vec3 position;
-	glm::vec4 color;
-	glm::vec3 normals;
-};
-
-Object::Object(const std::string& filepath) {
-		loadModel(filepath);
-}
 
 // Move constructor
 Object::Object(Object&& other) noexcept :
@@ -147,22 +136,11 @@ void Object::draw(unsigned int modelLocation) const{
 	glBindVertexArray(0);
 }
 
-void Object::addPhysics(bool enablePhysics, bool enableCollisions, bool isKinematic) {
-	if (!physics) physics = std::make_unique<Physics>(enablePhysics, enableCollisions, isKinematic);
-}
-void Object::removePhysics() {
-	if (physics) physics = nullptr;
-}
-
 void Object::deleteModel() {
 	if (VAO) glDeleteVertexArrays(1, &VAO);
 	if (VBO) glDeleteBuffers(1, &VBO);
 	if (EBO) glDeleteBuffers(1, &EBO);
 	VAO = VBO = EBO = 0;
 	indexCount = 0;
-}
-
-Object::~Object() {
-	deleteModel();
 }
 

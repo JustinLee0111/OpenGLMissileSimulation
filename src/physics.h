@@ -6,7 +6,11 @@ enum class BoundingBox{Plane, Box, Sphere};
 
 class Physics{
 public:
-	Physics(bool enableGravity = true, bool collisions = true, bool kinematic = false);
+	Physics(bool enableGravity, bool enableCollisions, bool isKinematic) {
+		this->enableGravity = enableGravity;
+		this->enableCollisions = enableCollisions;
+		this->isKinematic = isKinematic;
+	}
 	float mass{ 1.0f };
 	float restitution = 0.7f;
 	float radius = 1.0f;
@@ -21,7 +25,7 @@ public:
 
 	float gravity = -9.81f;
 
-	BoundingBox collider;
+	BoundingBox collider = BoundingBox::Sphere;
 
 	// Straight movements only
 	glm::vec3 moveDirection{ 0.0f, 1.0f, 0.0f };
@@ -29,5 +33,7 @@ public:
 	float moveSpeed = 3.0f;
 	float accumulatedTime = 0.0f;
 
-	void addForce(const glm::vec3& force);
+	void addForce(const glm::vec3& force) {
+		totalForces += force;
+	}
 };
