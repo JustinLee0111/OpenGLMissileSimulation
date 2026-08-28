@@ -8,109 +8,128 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "shaders.h"
-#include "triangle_mesh.h"
-#include "object.h"
-#include "physics.h"
-#include "world.h"
+#include "Object.h"
+#include "PhysicsData.h"
+#include "World.h"
+#include "camera.h"
 
 using namespace std;
 
 int main() {
-	ifstream file;
-	stringstream bufferedLines;
-	string line;
-	World world;
-
-    GLFWwindow* mainWindow;
-
 	if (!glfwInit()) {
 		cerr << "Failed to initialize GLFW" << endl;
 		return -1;
 	}
+	ifstream file;
+	stringstream bufferedLines;
+	string line;
+    GLFWwindow* mainWindow;
 
-	// Camera setup
-	glm::mat4 view = glm::lookAt(
-		glm::vec3(0.0f, 5.0f, 20.0f), // Camera position
-		glm::vec3(0.0f, 0.0f, 0.0f), // Look at point
-		glm::vec3(0.0f, 1.0f, 0.0f)  // Up vector
-	);
-
-	float aspectRatio = 2880.0f / 2160.0f;
-	glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 1000.0f);
-
-	mainWindow = glfwCreateWindow(2880, 2160, "Physics Sim", nullptr, nullptr);
+	float windowWidth = 1920.0f;
+	float windowHeight = 1440.0f;
+	mainWindow = glfwCreateWindow((int)windowWidth, (int)windowHeight, "Physics Sim", nullptr, nullptr);
 	glfwMakeContextCurrent(mainWindow);
-	
 	glfwSwapInterval(1);// VSYNC on
-
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		glfwTerminate();
 		return -1;
 	}
 
+	World world; // Main rendering manager and world manager
+	Camera* mainCamera = world.createCamera(windowWidth, windowHeight);
+
+	mainCamera->rotation *= glm::angleAxis(glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
 	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 
-	// Adds sphere object with physics enabled to worldObjects list
 	Object* sphere = world.spawnObject("models/sphere.obj", true);
-	sphere->position.y = 2.0f;
+	sphere->position.y = 1.0f;
 	sphere->position.z = 5.0f;
-	sphere->physics->gravity = -9.81f;
-	sphere->physics->collider = BoundingBox::Sphere;
-	sphere->physics->restitution = 0.25f;
+	sphere->position.x = 0.0f;
+	sphere->physicsProperties->collider = ColliderType::Sphere;
+	sphere->physicsProperties->restitution = 1.0f;
 
-	// Adds ground as a kinematic moving object
-	Object* ground = world.spawnObject("models/plane.obj", true, false, true, true);
-	ground->position.y = -1.0f;
+	Object* ground = world.spawnObject("models/plane.obj", true, false, true, false);
+	ground->position.y = -2.0f;
 	ground->position.z = 5.0f;
-	ground->physics->collider = BoundingBox::Plane;
-	ground->physics->restitution = 0.5f;
+	ground->physicsProperties->collider = ColliderType::Plane;
+	ground->physicsProperties->restitution = 1.0f;
+	ground->rotate({0,0,1}, 10.0f);
 
-	//TriangleMesh* triangle = new TriangleMesh();
+	Object* ground2 = world.spawnObject("models/plane.obj", true, false, true, false);
+	ground2->position.y = -2.0f;
+	ground2->position.z = 5.0f;
+	ground2->position.x = -2.0f;
+	ground2->physicsProperties->collider = ColliderType::Plane;
+	ground2->physicsProperties->restitution = 1.0f;
+	ground2->rotate({ 0,0,1 }, -10.0f);
 
-	shaders shaderProgram;
-	unsigned int shader = shaderProgram.make_shader("shaders/vertex.vert", "shaders/fragment.frag");
-	glUseProgram(shader);
-	
-	unsigned int modelLocation = glGetUniformLocation(shader, "model");
-	unsigned int viewLoc = glGetUniformLocation(shader, "view");
-	unsigned int projectionLoc = glGetUniformLocation(shader, "projection");
+	Object* ground3 = world.spawnObject("models/plane.obj", true, false, true, false);
+	ground3->position.y = 0.0f;
+	ground3->position.z = 5.0f;
+	ground3->position.x = 1.0f;
+	ground3->physicsProperties->collider = ColliderType::Plane;
+	ground3->physicsProperties->restitution = 1.0f;
+	ground3->rotate({ 0,0,1 }, 90.0f);
 
-	// Upload view and projection
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	Object* ground4 = world.spawnObject("models/plane.obj", true, false, true, false);
+	ground4->position.y = 0.0f;
+	ground4->position.z = 5.0f;
+	ground4->position.x = -3.0f;
+	ground4->physicsProperties->collider = ColliderType::Plane;
+	ground4->physicsProperties->restitution = 1.0f;
+	ground4->rotate({ 0,0,1 }, -90.0f);
+
+	Object* ground5 = world.spawnObject("models/plane.obj", true, false, true, false);
+	ground5->position.y = 2.0f;
+	ground5->position.z = 5.0f;
+	ground5->position.x = -1.0f;
+	ground5->physicsProperties->collider = ColliderType::Plane;
+	ground5->physicsProperties->restitution = 1.0f;
+	ground5->rotate({ 0,0,1 }, 180.0f);
 
 	// Fixed physics rate of 60hz
 	const float fixedDeltaTime = world.getPhysicsRate();
 	float accumulator = 0.0f;
 	float lastFrame = (float)glfwGetTime();
 
+	double xPos = windowWidth / 2.0;
+	double yPos = windowHeight / 2.0;
+
+	glfwGetCursorPos(mainWindow, &xPos, &yPos);
+
 	while (!glfwWindowShouldClose(mainWindow)) {
 		glfwPollEvents();
-		glUseProgram(shader);
 
 		float currentFrame = (float)glfwGetTime();
 		float frameTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		
+		double newXMousePos;
+		double newYMousePos;
+		glfwGetCursorPos(mainWindow, &newXMousePos, &newYMousePos);
+		mainCamera->cameraUpdate(newXMousePos - xPos, newYMousePos - yPos);
+		glfwSetCursorPos(mainWindow, windowWidth / 2, windowHeight / 2);
+		glfwGetCursorPos(mainWindow, &xPos, &yPos);
+		
+		if (glfwGetKey(mainWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+			glfwSetWindowShouldClose(mainWindow, true);
 
 		// Extreme low fps frametime clamp
 		if (frameTime > 0.25f) frameTime = 0.25f;
-
 		accumulator += frameTime;
 
 		// Ensures physics simulation does fixed time steps regardless of fps
 		while (accumulator >= fixedDeltaTime) {
-			world.update(fixedDeltaTime);
+			world.update();
 			accumulator -= fixedDeltaTime;
 		}
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		world.draw(modelLocation);
-		glfwSwapBuffers(mainWindow);
+		world.draw();
+		glfwSwapBuffers(mainWindow);	
 	}
-
-	glDeleteProgram(shader);
 	glfwTerminate();
     return 0;
 }

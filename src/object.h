@@ -1,48 +1,42 @@
 #pragma once
 
-#include <string>
 #include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <memory>
 
-#include "physics.h"
+#include "PhysicsData.h"
+
+class Model;
 
 class Object {
 public:
-	struct Vertex {
-		glm::vec3 position;
-		glm::vec4 color;
-		glm::vec3 normals;
-	};
-
 	glm::vec3 position{ 0.0f };
-	glm::vec3 rotation{ 0.0f };
+	glm::quat rotationQ{ 1.0f, 0.0f, 0.0f, 0.0f };
 	glm::vec3 scale{ 1.0f };
 
-	std::unique_ptr<Physics> physics;
+	glm::vec3 left = rotationQ * glm::vec3{ -1.0f, 0.0f, 0.0f };
+	glm::vec3 front = rotationQ * glm::vec3{ 0.0f, 0.0f, 1.0f };
+	glm::vec3 up = rotationQ * glm::vec3{ 0.0f, 1.0f, 0.0f };
+	glm::vec3 normal = rotationQ * glm::vec3{ 0.0f, 1.0f, 0.0f };
 
-	Object(const std::string& filepath) {
-		loadModel(filepath);
-	}
-	~Object() {
-		deleteModel();
-	}
-	// Removes copying and assignment
-	Object(const Object&) = delete;            
-	Object& operator=(const Object&) = delete;
-	// Move & assignment constructor
-	Object(Object&& other) noexcept;            
-	Object& operator=(Object&& other) noexcept;
+	std::unique_ptr<PhysicsData> physicsProperties;
+	std::shared_ptr<Model> model;
 
-	void loadModel(const std::string& filepath);
-	void deleteModel();
-	void draw(unsigned int modelLocation) const;
+	Object() = default;
+	~Object() = default;
 
-	void addPhysics(bool enablePhysics, bool enableCollisions, bool isKinematic) {
-		if (!physics) physics = std::make_unique<Physics>(enablePhysics, enableCollisions, isKinematic);
+	void draw() const;
+	glm::mat4 getObjectMatrix() const;
+
+	void rotate(glm::vec3 axis, float angle) {
+		glm::quat q = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
+		rotationQ *= q;
 	}
+	void setRotation(glm::vec3 axis, float angle) {
+		rotationQ = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
+	}
+	void addPhysics(bool enablePhysics, bool enableCollisions, bool isKinematic);
 	void removePhysics() {
-		if (physics) physics = nullptr;
+		if (physicsProperties) physicsProperties = nullptr;
 	}
-private:
-	unsigned int VBO, VAO, EBO, vertexCount, indexCount;
 };

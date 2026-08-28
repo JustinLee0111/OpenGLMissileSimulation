@@ -1,93 +1,175 @@
-#include "physicsEngine.h"
-#include "object.h"
-#include "physics.h"
+#include "PhysicsEngine.h"
+#include "Object.h"
+#include "PhysicsData.h"
 
-#include <iostream>
+void PhysicsEngine::update() {
+	forcesUpdater(deltaTime);
 
-void PhysicsEngine::update(float deltaTime) {
-	// Updates all kinematic objects
-	// Currently only for straight movements
+	float hitTime = earliestCollision(deltaTime);
+
+	if (hitTime <= deltaTime && hitTime >= 0.0f) {
+		positionUpdater(hitTime, deltaTime);
+		resolveCollisions(deltaTime - hitTime);
+		positionUpdater(deltaTime - hitTime, deltaTime);
+	}
+	else{
+		positionUpdater(deltaTime, deltaTime);
+	}
+
+	if (hitTime < 0.0f || hitTime == 1000.0f) {
+		resolveCollisions(deltaTime);
+	}
+}
+
+// Updates all kinematic objects
+// Currently only for straight, point-to-point, movements
+// CURRENTLY NOT WORKING, WILL UPDATE
+void PhysicsEngine::kinematicUpdater(float deltaTime) {
 	for (auto& object : physObjects) {
-		if (!object || !object->physics || !object->physics->isKinematic || object->physics->mass <= 0.0f) continue;
+		if (!object || !object->physicsProperties || !object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f) continue;
 		glm::vec3 oldPos = object->position;
 
 		// Calculates how much to move
-		float oldOffset = (std::sin(object->physics->accumulatedTime) * object->physics->moveDistance);
-		object->physics->accumulatedTime += deltaTime * object->physics->moveSpeed;
-		float newoffset = (std::sin(object->physics->accumulatedTime) * object->physics->moveDistance);
+		float oldOffset = (std::sin(object->physicsProperties->accumulatedTime) * object->physicsProperties->moveDistance);
+		object->physicsProperties->accumulatedTime += deltaTime * object->physicsProperties->moveSpeed;
+		float newoffset = (std::sin(object->physicsProperties->accumulatedTime) * object->physicsProperties->moveDistance);
 
-		object->position += (object->physics->moveDirection * (newoffset - oldOffset));
+		object->position += (object->physicsProperties->moveDirection * (newoffset - oldOffset));
 
-		object->physics->velocity = (object->position - oldPos) / deltaTime;
-	}
-
-	// Updates all non kinematic objects
-	for (auto &object : physObjects) {
-		if (!object || !object->physics || object->physics->isKinematic || object->physics->mass <= 0.0f) continue;
-		if (object->physics->enableGravity && !object->physics->isGrounded) {
-			object->physics->addForce({ 0.0f, object->physics->mass * object->physics->gravity, 0.0f });
-		}
-		glm::vec3 acceleration = object->physics->totalForces / object->physics->mass;
-		object->physics->velocity += acceleration * deltaTime;
-		object->position += object->physics->velocity * deltaTime;
-		object->physics->isGrounded = false; // Makes the collision checker recheck object grounded status
-		object->physics->totalForces = glm::vec3{ 0.0f };
-	}
-	checkCollisions(deltaTime);
+		object->physicsProperties->velocity = (object->position - oldPos) / deltaTime;
+	}	
 }
 
-// Currently assumes one object is an infinite mass plane and one is not a plane
-// Also only for Y axis bounces and no plane rotation/translation beside up and down
-void PhysicsEngine::planeCollision(Object* obj1, Object* obj2, const float& deltaTime){
-	if (!obj1 || !obj2 || !obj1->physics || !obj2->physics || (obj1->physics->collider == BoundingBox::Plane && obj2->physics->collider == BoundingBox::Plane)) return;
-	Object* sphere = (obj1->physics->collider != BoundingBox::Plane) ? obj1 : obj2;
-	Object* plane = (obj1->physics->collider == BoundingBox::Plane) ? obj1 : obj2;
+float PhysicsEngine::earliestCollision(float deltaTime) {
+	float hitTime = 1000.0f;
 
-	float sphereBottom = 0.0f;
+	for (int i = 0; i < physObjects.size(); ++i) {
+		for (int j = i + 1; j < physObjects.size(); ++j) {
+			if (!physObjects[i] || !physObjects[j] || !physObjects[i]->physicsProperties || !physObjects[j]->physicsProperties || (physObjects[i]->physicsProperties->collider == ColliderType::Plane && physObjects[j]->physicsProperties->collider == ColliderType::Plane)) continue;
+			Object* sphere = (physObjects[i]->physicsProperties->collider != ColliderType::Plane) ? physObjects[i] : physObjects[j];
+			Object* plane = (physObjects[i]->physicsProperties->collider == ColliderType::Plane) ? physObjects[i] : physObjects[j];
+			
+			glm::vec3 planeToSphereVec = sphere->position - plane->position; // From center of plane to center of sphere
 
-	if (glm::distance(sphere->position, plane->position) > sphere->physics->radius + 0.5f) return; // Doesn't run through collision checker if too far away
+			glm::vec3 closestPointOnPlane = plane->position
+				+ plane->left * glm::clamp(glm::dot(planeToSphereVec, plane->left), -plane->physicsProperties->planeWidth / 2, plane->physicsProperties->planeWidth / 2)
+				+ plane->front * glm::clamp(glm::dot(planeToSphereVec, plane->front), -plane->physicsProperties->planeHeight / 2, plane->physicsProperties->planeHeight / 2);
 
-	sphereBottom = sphere->position.y - sphere->physics->radius;
+			glm::vec3 planeToSphereClosest = sphere->position - closestPointOnPlane;
 
-	float groundPenetration = plane->position.y - sphereBottom;
-	float combinedRestitution = (sphere->physics->restitution + plane->physics->restitution == 0.0f) ? 0.0f : // Uses harmonic combination to get a combined restitution value
-		(2 * sphere->physics->restitution * plane->physics->restitution) / (sphere->physics->restitution + plane->physics->restitution);
-	float frameFraction = 0.0f; // Percentage of the frame that ball was penetrating ground
+			float distToPlaneClosest = glm::length(planeToSphereClosest);			
 
-	// Check if grounded
-	if (std::abs(sphere->physics->velocity.y - plane->physics->velocity.y) < 0.25f && groundPenetration > -0.05f) { 
-		sphere->physics->isGrounded = true;
-		sphere->position.y = plane->position.y + sphere->physics->radius;
-		sphere->physics->velocity = plane->physics->velocity;
-	}
-	else if (groundPenetration > 0.0f && !sphere->physics->isGrounded) { // Calculate bounce if sphere penetrates ground
-		if (glm::dot(sphere->physics->velocity, sphere->physics->velocity) > 0.00001f) { // Check if object isn't stationary
-			frameFraction = std::abs(groundPenetration / (sphere->physics->velocity.y * deltaTime));
-			frameFraction = std::min(frameFraction, 1.0f); // If object is travelling too fast, issues with reduced bounce, will be fixed
+			glm::vec3 dynamicNormal = (distToPlaneClosest > 0.00001f) ? glm::normalize(planeToSphereClosest) : plane->up;
+
+			float projVelNormalTowardsPlane = glm::dot(sphere->physicsProperties->velocity, dynamicNormal); // Projected approach velocity towards plane
+
+			if (projVelNormalTowardsPlane < -0.5f) {
+				float avgApproachSpeed = glm::dot(sphere->physicsProperties->velocity - 0.5f * glm::vec3{ 0.0f, gravity, 0.0f } * deltaTime, dynamicNormal);
+
+				float surfaceDistToPlaneClosest = distToPlaneClosest - sphere->physicsProperties->radius;
+
+				float tempHitTime = (glm::length(sphere->physicsProperties->velocity) > 0.00001f) ? (-surfaceDistToPlaneClosest / avgApproachSpeed) : 1000.0f;
+
+				if (hitTime > tempHitTime) hitTime = tempHitTime;
+			}
 		}
+	}
+	return hitTime;
+}
 
-		std::cout << "Penetration: " << groundPenetration << std::endl;
-		std::cout << "Frame Fraction: " << frameFraction << std::endl;
-		std::cout << "-Initial Y Velocity: " << sphere->physics->velocity.y << std::endl;
-		std::cout << "-Initial Y Position: " << sphere->position.y << std::endl;
+void PhysicsEngine::positionUpdater(float hitTime, float deltaTime) {
+	for (auto& object : physObjects) {
+		if (!object || !object->physicsProperties || object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f) continue;
+		glm::vec3 avgVel{ 0.0f };
+		if (object->physicsProperties->enableGravity) {
+			avgVel = object->physicsProperties->velocity - 0.5f * glm::vec3{ 0.0f, gravity, 0.0f } * deltaTime;
+		}
+		object->physicsProperties->isGrounded = false; // Makes the collision checker recheck object grounded state
 
-		// Inverts velocity of sphere, adds its bounced exit velocity based on restitution, and adds velocity of platform 
-		sphere->physics->velocity.y = plane->physics->velocity.y + (plane->physics->velocity.y  - sphere->physics->velocity.y) * combinedRestitution;
+		object->position += avgVel * hitTime;
+		
+		object->normal = object->rotationQ * glm::vec3{ 0.0f, 1.0f, 0.0f };
+		object->left = object->rotationQ * glm::vec3{ 1.0f, 0.0f, 0.0f };
+		object->front = object->rotationQ * glm::vec3{ 0.0f, 0.0f, 1.0f };
+		object->up = object->rotationQ * glm::vec3{ 0.0f, 1.0f, 0.0f };
+	}
+}
 
-		std::cout << "+Final Y Velocity: " << sphere->physics->velocity.y << std::endl;
-		std::cout << "+Final Y Position: " << sphere->position.y << std::endl;
-		std::cout << std::endl;
+void PhysicsEngine::forcesUpdater(float deltaTime) {
+	// Updates all non kinematic objects
+	for (auto& object : physObjects) {
+		if (!object || !object->physicsProperties || object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f) continue;
+		if (object->physicsProperties->enableGravity) {
+			object->physicsProperties->addForce({ 0.0f, object->physicsProperties->mass * gravity, 0.0f });
+		}
+		glm::vec3 acceleration = object->physicsProperties->totalForces / object->physicsProperties->mass;
+		object->physicsProperties->velocity += acceleration * deltaTime;
+		object->physicsProperties->totalForces = glm::vec3{ 0.0f };
+	}
+}
 
-		sphere->position.y = plane->position.y + sphere->physics->radius + deltaTime * sphere->physics->velocity.y * frameFraction; // Sets the sphere to correct position after bounce
+// Continuous Collision Detection (CCD)
+// Currently assumes one object is an infinite mass plane and one is not a plane
+// Works for bounded planes and has resting state
+void PhysicsEngine::planeCollision(Object* obj1, Object* obj2, const float& deltaTime){
+	if (!obj1 || !obj2 || !obj1->physicsProperties || !obj2->physicsProperties || (obj1->physicsProperties->collider == ColliderType::Plane && obj2->physicsProperties->collider == ColliderType::Plane)) return;
+	Object* sphere = (obj1->physicsProperties->collider != ColliderType::Plane) ? obj1 : obj2;
+	Object* plane = (obj1->physicsProperties->collider == ColliderType::Plane) ? obj1 : obj2;
+
+	glm::vec3 planeToSphereVec = sphere->position - plane->position; // From center of plane to center of sphere
+
+	float combinedRestitution = (sphere->physicsProperties->restitution + plane->physicsProperties->restitution == 0.0f) ? 0.0f : // Uses harmonic combination to get a combined restitution value
+		(2 * sphere->physicsProperties->restitution * plane->physicsProperties->restitution) / (sphere->physicsProperties->restitution + plane->physicsProperties->restitution);
+
+	// Gets the point on the plane closest to sphere, bounded by the plane width and height
+	glm::vec3 closestPointOnPlane = plane->position 
+		+ plane->left * glm::clamp(glm::dot(planeToSphereVec, plane->left), -plane->physicsProperties->planeWidth / 2, plane->physicsProperties->planeWidth / 2)
+		+ plane->front * glm::clamp(glm::dot(planeToSphereVec, plane->front), -plane->physicsProperties->planeHeight / 2, plane->physicsProperties->planeHeight / 2);
+
+	glm::vec3 planeToSphereClosest = sphere->position - closestPointOnPlane;
+
+	float distToPlaneClosest = glm::length(planeToSphereClosest);
+
+	glm::vec3 dynamicNormal = (distToPlaneClosest > 0.00001f) ? glm::normalize(planeToSphereClosest) : plane->up; // Normal that follows the sphere's movements, used to bounce off edges mainly
+
+	float surfaceDistToPlaneClosest = distToPlaneClosest - sphere->physicsProperties->radius;
+
+	float projVelNormalTowardsPlane = glm::dot(sphere->physicsProperties->velocity, dynamicNormal); // Projected approach velocity towards plane
+
+	if (projVelNormalTowardsPlane < -0.5f) { // Only if moving towards plane
+		float avgApproachSpeed = glm::dot(sphere->physicsProperties->velocity - 0.5f * glm::vec3{ 0.0f, gravity, 0.0f } * deltaTime, dynamicNormal);
+		
+		float hitTime = (glm::length(sphere->physicsProperties->velocity) > 0.00001f) ? (-surfaceDistToPlaneClosest / avgApproachSpeed) : 1.0f;
+
+		if (hitTime < 0.0f) hitTime = 0.0f;
+
+		if (hitTime >= 0.0f && hitTime <= deltaTime) { // Check if the plane is being hit within the frame
+			glm::vec3 velAtImpact = sphere->physicsProperties->velocity - glm::vec3{ 0.0f, gravity, 0.0f } * (deltaTime - hitTime);
+
+			sphere->physicsProperties->velocity += -(1 + combinedRestitution) * glm::dot(velAtImpact, dynamicNormal) * dynamicNormal;
+		}
+	}
+	else if (projVelNormalTowardsPlane >= -0.5f && projVelNormalTowardsPlane <= 0.5f && distToPlaneClosest <= sphere->physicsProperties->radius) { // Only if near plane and not moving too much away or towards plane
+		sphere->physicsProperties->isGrounded = true;
+
+		glm::vec3 velocityPerpendicular = glm::dot(dynamicNormal, sphere->physicsProperties->velocity) * dynamicNormal;
+
+		sphere->physicsProperties->velocity -= velocityPerpendicular;
+		if(glm::length(planeToSphereClosest) < sphere->physicsProperties->radius){
+			sphere->position += (sphere->physicsProperties->radius - glm::length(planeToSphereClosest)) * dynamicNormal;
+		}		
+		else {
+			sphere->position -= (glm::length(planeToSphereClosest) - sphere->physicsProperties->radius) * dynamicNormal;
+		}
 	}
 }
 
 // Checks all objects for collisions
 // Will replace with a more efficient scan
-void PhysicsEngine::checkCollisions(const float& deltaTime) {
+void PhysicsEngine::resolveCollisions(const float& deltaTime) {
 	for (int i = 0; i < physObjects.size(); ++i) {
 		for (int j = i + 1; j < physObjects.size(); ++j) {
-			//if(physObjects[i]->physics->collider != BoundingBox::Plane && physObjects[j])
+			//if(physObjects[i]->physicsProperties->collider != BoundingBox::Plane && physObjects[j])
 			PhysicsEngine::planeCollision(physObjects[i], physObjects[j], deltaTime);
 		}
 	}
