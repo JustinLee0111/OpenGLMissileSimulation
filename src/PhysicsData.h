@@ -15,6 +15,7 @@ struct PhysicsData{
 	// Simulation Bools
 	bool enableGravity = true;
 	bool enableCollisions = true;
+	bool isStatic = true;
 	bool isGrounded = false;
 	bool isKinematic = false;
 

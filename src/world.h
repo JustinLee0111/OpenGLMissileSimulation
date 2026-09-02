@@ -17,6 +17,7 @@ public:
 	// All objects and cameras stored here
 	std::vector<std::unique_ptr<Object>> objects;
 	std::vector<std::unique_ptr<Camera>> cameras;
+	static Camera* currentCamera;
 
 	World() : shader("shaders/vertex.vert", "shaders/fragment.frag"){}
 
