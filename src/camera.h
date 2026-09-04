@@ -10,6 +10,7 @@ class Camera {
 		float windowHeight;
 		float aspectRatio;
 		float sensitivity = 0.15f;
+		static bool mouseControl;
 
 		// Camera default setup
 		glm::mat4 view{ 1.0f };

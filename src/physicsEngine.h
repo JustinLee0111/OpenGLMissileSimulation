@@ -20,13 +20,15 @@ public:
 	std::vector<Object*> physObjects;
 
 	glm::vec3 gravity = { 0.0f, -9.81f, 0.0f };
+	const float threshold = 0.00001f; // Threshold for floating point errors and small calculation deviations
+	const float restingThreshold = 0.5f; // Threshold for speeds to start resting
 
 	void update();
 	void kinematicUpdater(float deltaTime);
 	void positionUpdater(float hitTime);
 	void forcesUpdater(float deltaTime);
 	void forcesReset();
-	HitData earliestCollision(float deltaTime);
+	std::vector<HitData> earliestCollision(float deltaTime);
 	void addPhysObject(Object* obj) {
 		if (obj && obj->physicsProperties) {
 			physObjects.push_back(obj);

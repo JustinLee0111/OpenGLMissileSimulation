@@ -1,5 +1,6 @@
 #include "World.h"
 #include "AssetManager.h"
+#include "InputHandler.h"
 
 Camera* World::currentCamera = nullptr;
 
@@ -33,6 +34,7 @@ void World::update() {
 // Currently only for one camera
 void World::draw() const {
 	shader.use();
+
 	// Upload view and projection
 	shader.setMat4("view", currentCamera->view);
 	shader.setMat4("projection", currentCamera->projection);

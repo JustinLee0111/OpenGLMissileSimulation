@@ -2,6 +2,8 @@
 
 #include "camera.h"
 
+bool Camera::mouseControl = false;
+
 // Updates the camera rotation based on X and Y angles
 void Camera::cameraRotate(float xDelta, float yDelta) {
 	glm::quat yaw = glm::angleAxis(glm::radians(xDelta), glm::vec3{ 0.0f, 1.0f ,0.0f });
