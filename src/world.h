@@ -2,32 +2,33 @@
 
 #include <vector>
 #include <memory>
+#include <string>
 
 #include "PhysicsEngine.h"
 #include "camera.h"
-#include "Shader.h"
 
+class InputHandler;
 class Object;
 
 class World {
 private:
 	PhysicsEngine physicsEngine;
-	Shader shader;
 public:
 	// All objects and cameras stored here
 	std::vector<std::unique_ptr<Object>> objects;
 	std::vector<std::unique_ptr<Camera>> cameras;
 	static Camera* currentCamera;
-
-	World() : shader("shaders/vertex.vert", "shaders/fragment.frag"){}
+	World() = default;
 
 	Object* spawnObject(const std::string& filepath, bool enablePhysics = false, bool enableGravity = true, bool enableCollisions = true, bool isKinematic = false);
 
-	Camera* createCamera(float windowWidth, float windowHeight);
+	Camera* createCamera();
 
-	void update();
+	void loadLevel(const std::string& filepath);
 
-	void draw() const;
+	void unloadLevel();
+
+	void update(const InputHandler& inputs);
 
 	float getPhysicsRate() const{
 		return physicsEngine.getPhysicsRate();

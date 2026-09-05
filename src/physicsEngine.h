@@ -9,7 +9,7 @@ struct HitData {
 	float distance = 0.0f;
 	float timeToHit = -1.0f;
 	glm::vec3 relativeVelocity{ 0.0f };
-	glm::vec3 hitPoint{ 0.0f };
+	glm::vec3 hitPoint{ 0.0f }; // Not used but could be useful for dynamic decals
 	glm::vec3 normal{ 0.0f };
 };
 
@@ -36,13 +36,11 @@ public:
 	}
 	void planeCollision(HitData& hitData);
 	void sphereCollision(HitData& hitData);
-	HitData planeCollisionData(Object& sphere, Object& plane, float timeLeft);
-	HitData sphereCollisionData(Object& sphere1, Object& sphere2, float timeLeft);
-	void resolveCollisions(HitData& hitData);
-	float totalEnergy();
-	float getPhysicsRate() const {
-		return deltaTime;
-	}
+	HitData planeCollisionData(Object& sphere, Object& plane, float timeLeft); // CCD implemented here
+	HitData sphereCollisionData(Object& sphere1, Object& sphere2, float timeLeft); // CCD implemented here
+	void resolveCollisions(HitData& hitData); // Resolves collision once simulation is advanced to the collision state
+	float totalEnergy(); // For debugging conservation of energy when restitutions are 1.0f
+	static float getPhysicsRate();
 private:
-	const float deltaTime = (1.0f / 60.0f);
+	static const float deltaTime;
 };

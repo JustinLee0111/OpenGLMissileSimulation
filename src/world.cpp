@@ -1,6 +1,7 @@
 #include "World.h"
 #include "AssetManager.h"
 #include "InputHandler.h"
+#include "LevelManager.h"
 
 Camera* World::currentCamera = nullptr;
 
@@ -19,31 +20,26 @@ Object* World::spawnObject(const std::string& filepath, bool enablePhysics, bool
 	return ptr;
 }
 
-Camera* World::createCamera(float windowWidth, float windowHeight) {
-	auto camera = std::make_unique<Camera>(windowWidth, windowHeight);
+void World::loadLevel(const std::string& filepath) {
+	LevelManager::loadLevel(filepath, *this);
+}
+
+void World::unloadLevel() {
+	objects.clear();
+	cameras.clear();
+	physicsEngine.physObjects.clear();
+	AssetManager::clearCache();
+	currentCamera = nullptr;
+}
+
+Camera* World::createCamera() {
+	auto camera = std::make_unique<Camera>();
 	Camera* cameraPtr = camera.get();
-	if (cameras.empty()) currentCamera = cameraPtr;
+	if (!currentCamera) currentCamera = cameraPtr;
 	cameras.push_back(std::move(camera));
 	return cameraPtr;
 }
 
-void World::update() {
+void World::update(const InputHandler& inputs){
 	physicsEngine.update();
-}
-
-// Currently only for one camera
-void World::draw() const {
-	shader.use();
-
-	// Upload view and projection
-	shader.setMat4("view", currentCamera->view);
-	shader.setMat4("projection", currentCamera->projection);
-
-	for (const auto& obj : objects) {
-		if (obj->model) {
-			shader.setMat4("model", obj->getObjectMatrix());
-			obj->draw();
-		}
-
-	}
 }

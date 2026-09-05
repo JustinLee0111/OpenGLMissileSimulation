@@ -1,0 +1,135 @@
+{
+  "levelName": "PhysicsSim",
+  "cameras": [
+    {
+      "cameraName": "mainCamera",
+      "position": [ 0.0, 2.0, 10.0 ],
+      "yaw": 0.0,
+      "pitch" : 0.0
+    }
+  ],
+  "objects": [
+    {
+      "objectName": "sphere1",
+      "modelPath": "assets/models/sphere.obj",
+      "physics": true,
+      "gravity": true,
+      "position": [ -1.5, 2.0, 0.0 ],
+      "collider": "Sphere",
+      "restitution": 0.6
+    },
+    {
+      "objectName": "sphere2",
+      "modelPath": "assets/models/sphere.obj",
+      "physics": true,
+      "gravity": true,
+      "position": [ 1.5, 2.0, 0.0 ],
+      "collider": "Sphere",
+      "restitution": 0.6
+    },
+    {
+      "objectName": "bottomLeftFloor",
+      "modelPath": "assets/models/plane.obj",
+      "physics": true,
+      "gravity": false,
+      "position": [ -1.5, 0.0, 0.0 ],
+      "collider": "Plane",
+      "restitution": 1.0,
+      "rotation": {
+        "axis": [ 0, 0, 1 ],
+        "angle": -5.0
+      }
+    },
+    {
+      "objectName": "bottomRightFloor",
+      "modelPath": "assets/models/plane.obj",
+      "physics": true,
+      "gravity": false,
+      "position": [ 1.5, 0.0, 0.0 ],
+      "collider": "Plane",
+      "restitution": 1.0,
+      "rotation": {
+        "axis": [ 0, 0, 1 ],
+        "angle": 5.0
+      }
+    },
+    {
+      "objectName": "bottomRightWall",
+      "modelPath": "assets/models/plane.obj",
+      "physics": true,
+      "gravity": false,
+      "position": [ 3.0, 1.0, 0.0 ],
+      "collider": "Plane",
+      "restitution": 1.0,
+      "rotation": {
+        "axis": [ 0, 0, 1 ],
+        "angle": 90.0
+      }
+    },
+    {
+      "objectName": "topRightWall",
+      "modelPath": "assets/models/plane.obj",
+      "physics": true,
+      "gravity": false,
+      "position": [ 3.0, 4.0, 0.0 ],
+      "collider": "Plane",
+      "restitution": 1.0,
+      "rotation": {
+        "axis": [ 0, 0, 1 ],
+        "angle": 90.0
+      }
+    },
+    {
+      "objectName": "bottomLeftWall",
+      "modelPath": "assets/models/plane.obj",
+      "physics": true,
+      "gravity": false,
+      "position": [ -3.0, 1.0, 0.0 ],
+      "collider": "Plane",
+      "restitution": 1.0,
+      "rotation": {
+        "axis": [ 0, 0, 1 ],
+        "angle": -90.0
+      }
+    },
+    {
+      "objectName": "topLeftWall",
+      "modelPath": "assets/models/plane.obj",
+      "physics": true,
+      "gravity": false,
+      "position": [ -3.0, 4.0, 0.0 ],
+      "collider": "Plane",
+      "restitution": 1.0,
+      "rotation": {
+        "axis": [ 0, 0, 1 ],
+        "angle": -90.0
+      }
+    },
+    {
+      "objectName": "topLeftRoof",
+      "modelPath": "assets/models/plane.obj",
+      "physics": true,
+      "gravity": false,
+      "position": [ -1.5, 5.0, 0.0 ],
+      "collider": "Plane",
+      "restitution": 1.0,
+      "rotation": {
+        "axis": [ 0, 0, 1 ],
+        "angle": 180.0
+      }
+    },
+    {
+      "objectName": "topRightRoof",
+      "modelPath": "assets/models/plane.obj",
+      "physics": true,
+      "gravity" : false,
+      "position": [ 1.5, 5.0, 0.0 ],
+      "collider": "Plane",
+      "restitution": 1.0,
+      "rotation": {
+        "axis": [ 0, 0, 1 ],
+        "angle": 180.0
+      }
+    }
+  ]
+}

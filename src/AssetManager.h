@@ -10,6 +10,8 @@ class AssetManager {
 	public:
 		static std::shared_ptr<Model> loadModel(const std::string& filepath);
 
+		~AssetManager() { clearCache(); }
+
 		static void clearCache() {
 			modelCache.clear();
 		}

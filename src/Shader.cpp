@@ -13,7 +13,6 @@ using namespace std;
 
 std::string Shader::readFile(const std::string& filepath) {
 	std::ifstream file;
-	// Ensure ifstream objects can throw exceptions:
 	file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	try {
 		file.open(filepath);

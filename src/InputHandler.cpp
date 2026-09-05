@@ -1,48 +1,31 @@
 #include "InputHandler.h"
 #include "World.h"
 
-GLFWwindow* InputHandler::currentWindow = nullptr;
-bool InputHandler::currentKeys[1024]{false};
-bool InputHandler::previousKeys[1024]{ false };
-float InputHandler::windowWidth;
-float InputHandler::windowHeight;
-double InputHandler::mouseXpos;
-double InputHandler::mouseYpos;
-float InputHandler::mouseSensitivity;
-
 void InputHandler::init(GLFWwindow* window) {
-	glfwSetKeyCallback(window, key_callback);
-	currentWindow = window;
-	windowWidth = 1920.0f; // REMOVE AND MAKE WINDOW/APPLICATION CLASS
-	windowHeight = 1440.0f; // REMOVE AND MAKE WINDOW/APPLICATION CLASS
-	mouseXpos = windowWidth / 2;
-	mouseYpos = windowHeight / 2;
-	mouseSensitivity = 0.1f;
+	glfwGetWindowSize(window, &windowWidth, &windowHeight);
 }
 
-void InputHandler::cameraController() {
-	double newXMousePos;
-	double newYMousePos;
-	glfwGetCursorPos(currentWindow, &newXMousePos, &newYMousePos);
-	double xDelta = newXMousePos - mouseXpos;
-	double yDelta = newYMousePos - mouseYpos;
-	World::currentCamera->cameraRotate(-xDelta * mouseSensitivity, -yDelta * mouseSensitivity);
-	glfwSetCursorPos(currentWindow, windowWidth / 2.0f, windowHeight / 2.0f);
-}
-
-void InputHandler::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (key >= 0 && key < 1024) {
-		if (action == GLFW_PRESS) { currentKeys[key] = true; }
-		if (action == GLFW_RELEASE) { currentKeys[key] = false; }
+void InputHandler::update(GLFWwindow* window) {
+	if (mouseCameraControl && World::currentCamera) {
+		cameraController(window);
 	}
 }
 
-bool InputHandler::isKeyPressed(int key) {
+void InputHandler::cameraController(GLFWwindow* window) {
+	double newXMousePos;
+	double newYMousePos;
+	glfwGetCursorPos(window, &newXMousePos, &newYMousePos);
+	double xDelta = newXMousePos - windowWidth / 2.0f;
+	double yDelta = newYMousePos - windowHeight / 2.0f;
+	World::currentCamera->cameraRotate(-xDelta * mouseSensitivity, -yDelta * mouseSensitivity);
+	glfwSetCursorPos(window, windowWidth / 2.0f, windowHeight / 2.0f);
+}
+
+bool InputHandler::isKeyPressed(int key) const{ // Checks if key is pressed, doesn't continuously repeat inputs
 	return currentKeys[key] && !previousKeys[key];
 }
 
-void InputHandler::keysUpdate() {
+void InputHandler::keysUpdate() { // Sets inputs during current frame to previous at the end of the frame
 	for (int i = 0; i < 1024; i++) {
 		previousKeys[i] = currentKeys[i];
 	}

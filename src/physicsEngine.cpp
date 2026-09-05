@@ -4,13 +4,18 @@
 
 #include <iostream>
 
+const float PhysicsEngine::deltaTime = (1.0f / 60.0f);
+
 // Order of update is: Position Update -> Forces Update -> Collision Resolving
 // Collisions is last since objects need to be moved and updated right up to colliding in order to resolve collisions with CCD
 void PhysicsEngine::update() {
 	float timeLeft = deltaTime;
 	for (int i = 0; i < 5 && timeLeft > threshold; i++) { // For loop to run through the time left for sub time stepping, max of 5 substeps
 		std::vector<HitData> nextHits = earliestCollision(timeLeft); // Stores all collisions happening on this frame / time left
-		float hitTime = nextHits[0].timeToHit;
+		float hitTime = 1.0f;
+		if (!nextHits.empty()) {
+			hitTime = nextHits[0].timeToHit;
+		}
 		//std::cout << hitTime << std::endl;
 		if (hitTime < 0.0f || timeLeft < hitTime || nextHits.empty()) { // If no collisions are happening, run through the entire timeLeft
 			positionUpdater(timeLeft);
@@ -102,6 +107,7 @@ void PhysicsEngine::positionUpdater(float hitTime) {
 			object->position += object->physicsProperties->velocity * hitTime;
 		}
 
+		// Not implemented yet, for future use during rotating collisions
 		object->normal = object->rotationQ * glm::vec3{ 0.0f, 1.0f, 0.0f };
 		object->left = object->rotationQ * glm::vec3{ 1.0f, 0.0f, 0.0f };
 		object->front = object->rotationQ * glm::vec3{ 0.0f, 0.0f, 1.0f };
@@ -139,7 +145,7 @@ float PhysicsEngine::totalEnergy() { // Used to check conservation of energy for
 	return energy;
 }
 
-void PhysicsEngine::planeCollision(HitData& hitData){
+void PhysicsEngine::planeCollision(HitData& hitData){ // Resolves plane and sphere collision
 	Object* sphere = hitData.objectHitter;
 	Object* plane = hitData.objectHit;
 
@@ -158,10 +164,10 @@ void PhysicsEngine::planeCollision(HitData& hitData){
 		sphere->position -= hitData.normal * planePenetration;
 	}
 	
-	if (normalSpeed < -restingThreshold) {
+	if (normalSpeed < -restingThreshold) { // Resolve collision
 		sphere->physicsProperties->velocity -= (1.0f + combinedRestitution) * normalSpeed * hitData.normal;
 	}
-	else{
+	else{ // Grounded state
 		sphere->physicsProperties->velocity -= normalSpeed * hitData.normal;
 	}
 }
@@ -177,7 +183,6 @@ HitData PhysicsEngine::planeCollisionData(Object& sphere, Object& plane, float t
 	collision.objectHitter = &sphere;
 
 	float hitTime = 1.0f;
-	float tolerance = 0.0001f;
 
 	glm::vec3 planeToSphere = sphere.position - plane.position;
 
@@ -217,11 +222,11 @@ HitData PhysicsEngine::planeCollisionData(Object& sphere, Object& plane, float t
 				glm::vec3 tempSphereVel = sphere.physicsProperties->velocity + sphereAcceleration * timeAccumulator;
 				glm::vec3 tempPlaneVel = plane.physicsProperties->velocity + planeAcceleration * timeAccumulator;
 
-				planeToSphere = tempSpherePos - tempPlanePos;
-				closestPointOnPlane = tempPlanePos
+				planeToSphere = tempSpherePos - tempPlanePos; // Vector from plane center to sphere center
+				closestPointOnPlane = tempPlanePos // Vector from the closest point on the plane to sphere, bounded by the plane dimensions, important for dynamic normal
 					+ plane.left * glm::clamp(glm::dot(planeToSphere, plane.left), -plane.physicsProperties->planeWidth / 2, plane.physicsProperties->planeWidth / 2)
 					+ plane.front * glm::clamp(glm::dot(planeToSphere, plane.front), -plane.physicsProperties->planeHeight / 2, plane.physicsProperties->planeHeight / 2);
-				planeToSphereClosest = tempSpherePos - closestPointOnPlane;
+				planeToSphereClosest = tempSpherePos - closestPointOnPlane; // Vector from the above vector to the sphere
 				distToSphereClosest = glm::length(planeToSphereClosest);
 
 				if (distToSphereClosest - sphere.physicsProperties->radius <= 0.0f) { // If the sphere is touching plane, get hitTime from timeAccumulator
@@ -230,12 +235,12 @@ HitData PhysicsEngine::planeCollisionData(Object& sphere, Object& plane, float t
 				}
 
 				glm::vec3 tempRelativeVel = tempSphereVel - tempPlaneVel;
-				float velocityMax = glm::length(tempRelativeVel) + glm::length(relativeAcceleration) * (timeLeft - timeAccumulator);
+				float velocityMax = glm::length(tempRelativeVel) + glm::length(relativeAcceleration) * (timeLeft - timeAccumulator); // Theoretical max velocity 
 				if (velocityMax < 0.0f) {
 					break;
 				}
 				float safeTimeStep = (distToSphereClosest - sphere.physicsProperties->radius) / velocityMax; // Calculates the guaranteed safe timestep so no collisions occur
-				if (safeTimeStep < 0.0f) {
+				if (safeTimeStep < 0.0f) { // Checks if sphere is colliding with plane
 					hitTime = (timeAccumulator >= 0.0f && timeAccumulator < hitTime) ? timeAccumulator : 1.0f;
 					break;
 				}
@@ -311,10 +316,10 @@ void PhysicsEngine::sphereCollision(HitData& hitData) {
 		sphere1->physicsProperties->velocity -= impulse * sphere1InverseMass * hitData.normal;
 		sphere2->physicsProperties->velocity += impulse * sphere2InverseMass * hitData.normal;
 	}
-	else {
+	else { // Resting state
 		float impulse = -normalSpeed / totalInverseMass; // Acts as perfectly inelastic collision
-		sphere1->physicsProperties->velocity -= impulse * sphere1InverseMass * hitData.normal;
-		sphere2->physicsProperties->velocity += impulse * sphere2InverseMass * hitData.normal;
+		sphere1->physicsProperties->velocity -= impulse * sphere1InverseMass * hitData.normal; // Zero velocity towards sphere2
+		sphere2->physicsProperties->velocity += impulse * sphere2InverseMass * hitData.normal; // Zero velocity towards sphere1
 	}
 }
 
@@ -389,7 +394,7 @@ HitData PhysicsEngine::sphereCollisionData(Object& sphere1, Object& sphere2, flo
 	return collision;
 }
 
-// Resolves the collision after velocity and position is updated to exact impact time
+// Resolves the collision after velocity and position is updated to exact impact time in update function above
 void PhysicsEngine::resolveCollisions(HitData& hitData) {
 	Object* obj1 = hitData.objectHitter;
 	Object* obj2 = hitData.objectHit;
@@ -402,4 +407,8 @@ void PhysicsEngine::resolveCollisions(HitData& hitData) {
 			PhysicsEngine::planeCollision(hitData);
 		}
 	}
+}
+
+float PhysicsEngine::getPhysicsRate(){
+	return PhysicsEngine::deltaTime;
 }

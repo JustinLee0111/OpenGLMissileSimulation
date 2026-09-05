@@ -35,7 +35,7 @@ public:
 	void setRotation(glm::vec3 axis, float angle) {
 		rotationQ = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
 	}
-	void addPhysics(bool enablePhysics, bool enableCollisions, bool isKinematic);
+	void addPhysics(bool enablePhysics = false, bool enableCollisions = true, bool isKinematic = false);
 	void removePhysics() {
 		if (physicsProperties) physicsProperties = nullptr;
 	}
