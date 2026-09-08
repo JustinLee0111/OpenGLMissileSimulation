@@ -12,5 +12,5 @@ glm::mat4 Camera::getViewMatrix() {
 	return glm::mat4_cast(glm::conjugate(rotation)) * glm::translate(glm::mat4(1.0f), -cameraPos);
 }
 glm::mat4 Camera::getProjectionMatrix(float aspectRatio) {
-	return glm::perspective(glm::radians(45.0f), aspectRatio, 0.1f, 1000.0f);
+	return glm::perspective(glm::radians(cameraFOV), aspectRatio, closePlane, farPlane);
 }

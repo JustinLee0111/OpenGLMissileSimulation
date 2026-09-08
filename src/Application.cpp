@@ -31,6 +31,8 @@ int Application::appInit() {
 	inputs.init(mainWindow);
 
 	world.loadLevel("assets/levels/PhysicsSimWorldData.json"); // Load default level
+	
+	world.worldInit();
 
 	return 0;
 }

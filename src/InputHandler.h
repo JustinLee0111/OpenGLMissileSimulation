@@ -7,7 +7,7 @@ class InputHandler {
 		bool currentKeys[1024]{ false };
 		bool previousKeys[1024]{ false };
 		void init(GLFWwindow* window);
-		void windowResize(float width, float height) { // Application calls this upon window resize
+		void windowResize(int width, int height) { // Application calls this upon window resize
 			windowWidth = width;
 			windowHeight = height;
 		}

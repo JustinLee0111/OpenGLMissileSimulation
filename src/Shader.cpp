@@ -62,7 +62,6 @@ Shader::Shader(const string& vertex_filepath, const string& fragment_filepath) {
 		glDetachShader(shaderID, shaderModule);
 		glDeleteShader(shaderModule);
 	}
-
 }
 	
 unsigned int Shader::make_module(const string& filepath, unsigned int module_type) {
@@ -104,9 +103,38 @@ void Shader::use() const {
 
 void Shader::setMat4(const std::string& name, const glm::mat4& matrix) const {
 	int loc = glGetUniformLocation(shaderID, name.c_str());
-	if (loc != -1) {
-		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
+	if (loc == -1) {
+		std::cout << "ERROR SETTING MATRIX: " << name << std::endl;
+		return;
 	}
+	glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::setVec3(const std::string& name, const glm::vec3& vector) const {
+	int loc = glGetUniformLocation(shaderID, name.c_str());
+	if (loc == -1) {
+		std::cout << "ERROR SETTING VECTOR: " << name << std::endl;
+		return;
+	}
+	glUniform3fv(loc, 1, glm::value_ptr(vector));
+}
+
+void Shader::setVec4(const std::string& name, const glm::vec4& vector) const {
+	int loc = glGetUniformLocation(shaderID, name.c_str());
+	if (loc == -1) {
+		std::cout << "ERROR SETTING VECTOR: " << name << std::endl;
+		return;
+	}
+	glUniform4fv(loc, 1, glm::value_ptr(vector));
+}
+
+void Shader::setFloat(const std::string& name, const float& value) const {
+	int loc = glGetUniformLocation(shaderID, name.c_str());
+	if (loc == -1) {
+		std::cout << "ERROR SETTING FLOAT: " << name << std::endl;
+		return;
+	}
+	glUniform1fv(loc, 1, &value);
 }
 
 Shader::~Shader() {

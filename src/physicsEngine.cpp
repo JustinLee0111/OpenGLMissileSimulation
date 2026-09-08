@@ -213,9 +213,10 @@ HitData PhysicsEngine::planeCollisionData(Object& sphere, Object& plane, float t
 	}
 	else {
 		// When the accelerations are the same, it uses analytical time of impact solving
-	// When different it uses conservative advancement since analytical solver breaks for different relative accelerations
-		float timeAccumulator = 0.0f; // Accumulator for conservative advancement, shows how long since start of this time frame contact is made
-		if (glm::length(relativeAcceleration) != 0.0f) { // For different relative accelerations, use conservative advancement
+		// When different, it uses conservative advancement since analytical solver breaks for different relative accelerations
+		float timeAccumulator = 0.0f; // Accumulator for conservative advancement, shows how long since start of advancing it has been, once the sphere collides, this becomes hitTime
+
+		if (glm::length(relativeAcceleration) != 0.0f) { // This is conservative advancement
 			while (timeAccumulator <= timeLeft) { // Keep doing advancements until timeAccumulator > timeLeft which means no collisions were detected in the path of the sphere
 				glm::vec3 tempSpherePos = sphere.position + sphere.physicsProperties->velocity * timeAccumulator + 0.5f * sphereAcceleration * timeAccumulator * timeAccumulator;
 				glm::vec3 tempPlanePos = plane.position + plane.physicsProperties->velocity * timeAccumulator + 0.5f * planeAcceleration * timeAccumulator * timeAccumulator;
@@ -244,7 +245,7 @@ HitData PhysicsEngine::planeCollisionData(Object& sphere, Object& plane, float t
 					hitTime = (timeAccumulator >= 0.0f && timeAccumulator < hitTime) ? timeAccumulator : 1.0f;
 					break;
 				}
-				timeAccumulator += safeTimeStep;
+				timeAccumulator += safeTimeStep; // If the sphere doesn't collide with plane, it goes onto the next safe timestep
 			}
 		}
 		else { // Analytical time solving
@@ -317,7 +318,7 @@ void PhysicsEngine::sphereCollision(HitData& hitData) {
 		sphere2->physicsProperties->velocity += impulse * sphere2InverseMass * hitData.normal;
 	}
 	else { // Resting state
-		float impulse = -normalSpeed / totalInverseMass; // Acts as perfectly inelastic collision
+		float impulse = -normalSpeed / totalInverseMass; // Acts as perfectly inelastic collision to prevent jittering
 		sphere1->physicsProperties->velocity -= impulse * sphere1InverseMass * hitData.normal; // Zero velocity towards sphere2
 		sphere2->physicsProperties->velocity += impulse * sphere2InverseMass * hitData.normal; // Zero velocity towards sphere1
 	}
