@@ -1,0 +1,36 @@
+{
+  "levelName": "PhysicsSimTesting",
+  "cameras": [
+    {
+      "cameraName": "mainCamera",
+      "position": [ 0.0, 2.0, 10.0 ],
+      "yaw": 0.0,
+      "pitch" : 0.0
+    }
+  ],
+  "objects": [
+    {
+      "objectName": "sphere1",
+      "modelPath": "assets/models/sphere.obj",
+      "physics": true,
+      "gravity": true,
+      "position": [ 0.0, 2.0, 0.0 ],
+      "collider": "Sphere",
+      "restitution": 0.5
+    },
+    {
+      "objectName": "floor",
+      "modelPath": "assets/models/plane.obj",
+      "physics": true,
+      "gravity": false,
+      "kinematic": true,
+      "position": [ 0.0, 0.0, 0.0 ],
+      "collider": "Plane",
+      "restitution": 1.0,
+      "rotation": {
+        "axis": [ 0, 0, 1 ],
+        "angle": 0.0
+      }
+    }
+  ]
+}

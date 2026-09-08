@@ -24,7 +24,7 @@ public:
 	const float restingThreshold = 0.5f; // Threshold for speeds to start resting
 
 	void update();
-	void kinematicUpdater(float deltaTime);
+	void kinematicUpdater(float timeLeft);
 	void positionUpdater(float hitTime);
 	void forcesUpdater(float deltaTime);
 	void forcesReset();

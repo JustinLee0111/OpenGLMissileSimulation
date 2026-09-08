@@ -98,7 +98,12 @@ void Application::processKeyBindings() {
 		inputs.mouseCameraControl = false;
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_L)) {
+		world.unloadLevel();
 		world.loadLevel("assets/levels/PhysicsSimWorldData.json");
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_T)) {
+		world.unloadLevel();
+		world.loadLevel("assets/levels/PhysicsTesting.json");
 	}
 }
 

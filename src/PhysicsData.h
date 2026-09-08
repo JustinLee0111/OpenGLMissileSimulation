@@ -28,7 +28,7 @@ struct PhysicsData{
 	// Straight movements only
 	glm::vec3 moveDirection{ 0.0f, 1.0f, 0.0f };
 	float moveDistance = 2.0f;
-	float moveSpeed = 3.0f;
+	float moveSpeed = 1.0f;
 	float accumulatedTime = 0.0f;
 
 	PhysicsData(bool enableGravity, bool enableCollisions, bool isKinematic) :

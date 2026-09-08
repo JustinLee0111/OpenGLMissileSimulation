@@ -19,7 +19,8 @@
 // S - Add down velocity
 // D - Add right velocity
 // U - Unload level
-// L - Load level (MAY GET LAGGY IF SPAMMED)
+// L - Load level
+// T - Load level with moving plane
 
 using namespace std;
 

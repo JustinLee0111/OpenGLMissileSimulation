@@ -16,7 +16,7 @@
       "gravity": true,
       "position": [ -1.5, 2.0, 0.0 ],
       "collider": "Sphere",
-      "restitution": 0.6
+      "restitution": 1.0
     },
     {
       "objectName": "sphere2",
@@ -25,7 +25,7 @@
       "gravity": true,
       "position": [ 1.5, 2.0, 0.0 ],
       "collider": "Sphere",
-      "restitution": 0.6
+      "restitution": 1.0
     },
     {
       "objectName": "bottomLeftFloor",

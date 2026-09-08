@@ -3,6 +3,8 @@
 #include "PhysicsData.h"
 
 #include <iostream>
+#include <cassert>
+#include <cmath>
 
 const float PhysicsEngine::deltaTime = (1.0f / 60.0f);
 
@@ -18,11 +20,13 @@ void PhysicsEngine::update() {
 		}
 		//std::cout << hitTime << std::endl;
 		if (hitTime < 0.0f || timeLeft < hitTime || nextHits.empty()) { // If no collisions are happening, run through the entire timeLeft
+			kinematicUpdater(timeLeft);
 			positionUpdater(timeLeft);
 			forcesUpdater(timeLeft);
 			timeLeft = 0.0f;
 		}
 		else{
+			kinematicUpdater(hitTime);
 			positionUpdater(hitTime);
 			forcesUpdater(hitTime);
 			for (auto& hit : nextHits) { // Resolves collisions that are happening in the same frame
@@ -32,6 +36,7 @@ void PhysicsEngine::update() {
 		}	
 	}
 	if (timeLeft > threshold) { // Runs through the rest of the timeLeft if substeps couldn't go through it
+		kinematicUpdater(timeLeft);
 		positionUpdater(timeLeft);
 		forcesUpdater(timeLeft);
 	}
@@ -40,21 +45,18 @@ void PhysicsEngine::update() {
 }
 
 // Updates all kinematic objects
-// Currently only for straight, point-to-point, movements
-// CURRENTLY NOT WORKING, WILL UPDATE
-void PhysicsEngine::kinematicUpdater(float deltaTime) {
+// Currently only for straight, point-to-point movements
+void PhysicsEngine::kinematicUpdater(float timeLeft) {
+	if (timeLeft <= 0.0f) return;
 	for (auto& object : physObjects) {
 		if (!object || !object->physicsProperties || !object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f) continue;
-		glm::vec3 oldPos = object->position;
 
 		// Calculates how much to move
 		float oldOffset = (std::sin(object->physicsProperties->accumulatedTime) * object->physicsProperties->moveDistance);
-		object->physicsProperties->accumulatedTime += deltaTime * object->physicsProperties->moveSpeed;
-		float newoffset = (std::sin(object->physicsProperties->accumulatedTime) * object->physicsProperties->moveDistance);
+		object->physicsProperties->accumulatedTime += timeLeft * object->physicsProperties->moveSpeed;
+		float newOffset = (std::sin(object->physicsProperties->accumulatedTime) * object->physicsProperties->moveDistance);
 
-		object->position += (object->physicsProperties->moveDirection * (newoffset - oldOffset));
-
-		object->physicsProperties->velocity = (object->position - oldPos) / deltaTime;
+		object->physicsProperties->velocity = (object->position + (object->physicsProperties->moveDirection * (newOffset - oldOffset)) - object->position) / timeLeft;
 	}	
 }
 
@@ -62,6 +64,7 @@ void PhysicsEngine::kinematicUpdater(float deltaTime) {
 std::vector<HitData> PhysicsEngine::earliestCollision(float timeLeft) {
 	std::vector<HitData> collisions;
 	float earliestTime = 1.0f;
+	if (timeLeft <= 0.0f) return collisions;
 
 	for (int i = 0; i < physObjects.size(); ++i) {
 		for (int j = i + 1; j < physObjects.size(); ++j) {
@@ -98,7 +101,7 @@ std::vector<HitData> PhysicsEngine::earliestCollision(float timeLeft) {
 // Updates position based on position equation
 void PhysicsEngine::positionUpdater(float hitTime) {
 	for (auto& object : physObjects) {
-		if (!object || !object->physicsProperties || object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f) continue;
+		if (!object || !object->physicsProperties || object->physicsProperties->mass <= 0.0f) continue;
 
 		if (object->physicsProperties->enableGravity) {
 			object->position += object->physicsProperties->velocity * hitTime + 0.5f * gravity * hitTime * hitTime;
@@ -117,6 +120,7 @@ void PhysicsEngine::positionUpdater(float hitTime) {
 
 // Updates the objects based on the total forces acted on the object in the frame
 void PhysicsEngine::forcesUpdater(float timeLeft) {
+	if (timeLeft <= 0.0f) return;
 	for (auto& object : physObjects) {
 		if (!object || !object->physicsProperties || object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f) continue;
 		glm::vec3 acceleration = object->physicsProperties->totalForces / object->physicsProperties->mass;
@@ -159,9 +163,9 @@ void PhysicsEngine::planeCollision(HitData& hitData){ // Resolves plane and sphe
 		return;
 	}
 
-	float planePenetration = hitData.distance - sphere->physicsProperties->radius;
-	if (planePenetration < -threshold) { // Incase of floating point error, corrects it
-		sphere->position -= hitData.normal * planePenetration;
+	float planePenetration = sphere->physicsProperties->radius - hitData.distance;
+	if (planePenetration > threshold) { // Incase of floating point error, corrects it
+		sphere->position += hitData.normal * planePenetration;
 	}
 	
 	if (normalSpeed < -restingThreshold) { // Resolve collision
@@ -170,6 +174,8 @@ void PhysicsEngine::planeCollision(HitData& hitData){ // Resolves plane and sphe
 	else{ // Grounded state
 		sphere->physicsProperties->velocity -= normalSpeed * hitData.normal;
 	}
+	assert(!std::isnan(sphere->position.x) && !std::isinf(sphere->position.x));
+	assert(!std::isnan(sphere->physicsProperties->velocity.x) && !std::isinf(sphere->physicsProperties->velocity.x));
 }
 
 // Continuous Collision Detection (CCD)
@@ -200,7 +206,8 @@ HitData PhysicsEngine::planeCollisionData(Object& sphere, Object& plane, float t
 		+ plane.front * glm::clamp(glm::dot(planeToSphere, plane.front), -plane.physicsProperties->planeHeight / 2, plane.physicsProperties->planeHeight / 2);
 	glm::vec3 planeToSphereClosest = sphere.position - closestPointOnPlane;
 	float distToSphereClosest = glm::length(planeToSphereClosest);
-	glm::vec3 dynamicNormal = (distToSphereClosest > 0.00001f) ? glm::normalize(planeToSphereClosest) : plane.up; // dynamicNormal allows for plane edge bounces, follows sphere direction
+	float distToSurface = distToSphereClosest - sphere.physicsProperties->radius;
+	glm::vec3 dynamicNormal = (distToSphereClosest > threshold) ? glm::normalize(planeToSphereClosest) : plane.up; // dynamicNormal allows for plane edge bounces, follows sphere direction
 
 	glm::vec3 relativeVelocity = sphere.physicsProperties->velocity - plane.physicsProperties->velocity;
 	glm::vec3 relativeAcceleration = sphereAcceleration - planeAcceleration;
@@ -276,7 +283,8 @@ HitData PhysicsEngine::planeCollisionData(Object& sphere, Object& plane, float t
 
 	planeToSphereClosest = newSpherePos - closestPointOnPlane;
 	distToSphereClosest = glm::length(planeToSphereClosest);
-	dynamicNormal = (distToSphereClosest > 0.00001f) ? glm::normalize(planeToSphereClosest) : plane.up;
+	distToSurface = distToSphereClosest - sphere.physicsProperties->radius;
+	dynamicNormal = (distToSphereClosest > threshold) ? glm::normalize(planeToSphereClosest) : plane.up;
 	relativeVelocity = sphereImpactVel - planeImpactVel;
 
 	collision.normal = dynamicNormal;

@@ -1,7 +1,8 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <iostream>
 
-#include <World.h>
+#include "World.h"
 #include "LevelManager.h"
 #include "camera.h"
 #include "Object.h"
@@ -30,6 +31,9 @@ void LevelManager::loadLevel(const std::string& filepath, World& world) {
 		Object* tempObject = world.spawnObject(tempString, true);
 		if (object.contains("gravity")) {
 			tempObject->physicsProperties->enableGravity = object["gravity"];
+		}
+		if (object.contains("kinematic")) {
+			tempObject->physicsProperties->isKinematic = object["kinematic"];
 		}
 		auto position = object["position"];
 		tempObject->position = glm::vec3{ position[0].get<float>(), position[1].get<float>(), position[2].get<float>() };
