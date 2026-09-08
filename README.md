@@ -8,14 +8,15 @@
 Project to learn OpenGL and refine C++ coding skills. Currently a custom collision physics simulator using Continuous Collision Detection with spheres and bounded planes.
 
 **<u>--- CONTROLS ---</u>**
-Left Alt - Lock/Unlock Camera to Mouse
-Escape - Exit Program
-W - Add up velocity to sphere
-A - Add left velocity to sphere
-S - Add down velocity to sphere
-D - Add right velocity to sphere
-U - Unload level
-L - Load level (MAY GET LAGGY IF SPAMMED)
+- Left Alt - Lock/Unlock Camera to Mouse
+- Escape - Exit Program
+- W - Add up velocity to sphere
+- A - Add left velocity to sphere
+- S - Add down velocity to sphere
+- D - Add right velocity to sphere
+- U - Unload level
+- L - Load level
+- T - Load level with moving plane
   
   **<u>-- FEATURES --</u>**
 - Continuous Collision Detection solver with both conservative advancement and analytical Time of Impact (TOI) solver.
