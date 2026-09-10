@@ -6,7 +6,7 @@
 #include <assimp/postprocess.h>
 
 
-#include "Model.h"
+#include "rendering/Model.h"
 
 // Loads model with all meshes
 Model::Model(const std::string& filepath) {
@@ -54,9 +54,39 @@ Model::Model(const std::string& filepath) {
 	}
 }
 
-void Model::draw() const {
+Model::Model(std::vector<glm::vec3>& vertices, std::vector<unsigned int>& indices, glm::vec4& color) {
+	deleteModel();
+	std::vector<Vertex> finalVertices;
+	// Create VBO vector
+	unsigned int vertexCount = vertices.size();
+	for (unsigned int i = 0; i < vertexCount; i++) {
+		Vertex vertex;
+		vertex.position = vertices[i];
+		vertex.color = color;
+		vertex.normals = glm::vec3(0.0f, 1.0f, 0.0f);
+		finalVertices.push_back(vertex);
+	}
+	Mesh mesh = Mesh(finalVertices, indices);
+	if (color.a < 1.0f) {
+		mesh.isTransparent = true;
+	}
+	// Create EBO vector
+	meshes.push_back(std::move(mesh));
+}
+
+void Model::drawTransparent() const {
 	for (const Mesh& mesh : meshes) {
-		mesh.draw();
+		if (mesh.isTransparent) {
+			mesh.draw();
+		}
+	}
+}
+
+void Model::drawOpaque() const {
+	for (const Mesh& mesh : meshes) {
+		if (!mesh.isTransparent) {
+			mesh.draw();
+		}
 	}
 }
 

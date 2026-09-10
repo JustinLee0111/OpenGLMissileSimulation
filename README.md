@@ -15,8 +15,12 @@ Project to learn OpenGL and refine C++ coding skills. Currently a custom collisi
 - S - Add down velocity to sphere
 - D - Add right velocity to sphere
 - U - Unload level
+<<<<<<< HEAD
 - L - Load level
 - T - Load level with moving plane
+=======
+- L - Load level (MAY GET LAGGY IF SPAMMED)
+>>>>>>> 7c29968b7aac8d07a0ea5a5b471db9a1ee476f35
   
   **<u>-- FEATURES --</u>**
 - Continuous Collision Detection solver with both conservative advancement and analytical Time of Impact (TOI) solver.

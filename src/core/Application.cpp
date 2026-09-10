@@ -1,7 +1,7 @@
 #include <iostream>
 #include <glad/glad.h>
 
-#include "Application.h"
+#include "core/Application.h"
 
 int Application::appInit() {
 	if (!glfwInit()) {
@@ -19,6 +19,9 @@ int Application::appInit() {
 	}
 
 	appRenderer.rendererInit();
+	if (debugEnabled) {
+		debug.Init(&world, getAspectRatio());
+	}
 
 	glfwSetWindowUserPointer(mainWindow, this); // Sets this window context to the user pointer, can be retreived to pass window context to functions
 
@@ -27,6 +30,7 @@ int Application::appInit() {
 
 	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	inputs.init(mainWindow);
 
@@ -41,6 +45,7 @@ void Application::runApp(){
 	float lastFrame = (float)glfwGetTime();
 	const float fixedDeltaTime = PhysicsEngine::getPhysicsRate();
 	while (!glfwWindowShouldClose(Application::mainWindow)) {
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwPollEvents();
 		processKeyBindings();
 		inputs.update(mainWindow);
@@ -56,16 +61,20 @@ void Application::runApp(){
 		// Ensures physics simulation does fixed time steps regardless of fps
 		while (accumulator >= fixedDeltaTime) {
 			if (!world.objects.empty()) {
-				world.update(inputs);
+				world.update();
 			}
 			accumulator -= fixedDeltaTime;
 		}
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		if (world.currentCamera) {
 			appRenderer.draw(world, getAspectRatio());
 		}
-		glfwSwapBuffers(mainWindow);
+		for (auto& missile : world.missiles) {
+			Debugging::cone(missile->position, missile->front);
+		}
+
 		inputs.keysUpdate();
+
+		glfwSwapBuffers(mainWindow);
 	}
 }
 
@@ -80,17 +89,45 @@ void Application::processKeyBindings() {
 		inputs.mouseCameraControl = !inputs.mouseCameraControl;
 	}
 
-	if (inputs.isKeyPressed(GLFW_KEY_W)) {
-		world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 4.0f, 0.0f };
+	if (!world.objects.empty()) {
+		if (inputs.isKeyPressed(GLFW_KEY_W)) {
+			world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 4.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_A)) {
+			world.objects[0]->physicsProperties->velocity += glm::vec3{ -4.0f, 0.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_S)) {
+			world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, -4.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_D)) {
+			world.objects[0]->physicsProperties->velocity += glm::vec3{ 4.0f, 0.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
+			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, 1.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_LEFT)) {
+			world.objects[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, 1.0f, 0.0f };
+		}
 	}
-	if (inputs.isKeyPressed(GLFW_KEY_A)) {
-		world.objects[0]->physicsProperties->velocity += glm::vec3{ -4.0f, 0.0f, 0.0f };
-	}
-	if (inputs.isKeyPressed(GLFW_KEY_S)) {
-		world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, -4.0f, 0.0f };
-	}
-	if (inputs.isKeyPressed(GLFW_KEY_D)) {
-		world.objects[0]->physicsProperties->velocity += glm::vec3{ 4.0f, 0.0f, 0.0f };
+	if (!world.missiles.empty()) {
+		if (inputs.isKeyPressed(GLFW_KEY_W)) {
+			world.missiles[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 4.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_A)) {
+			world.missiles[0]->physicsProperties->velocity += glm::vec3{ -4.0f, 0.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_S)) {
+			world.missiles[0]->physicsProperties->velocity += glm::vec3{ 0.0f, -4.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_D)) {
+			world.missiles[0]->physicsProperties->velocity += glm::vec3{ 4.0f, 0.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
+			world.missiles[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, 1.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_LEFT)) {
+			world.missiles[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, 1.0f, 0.0f };
+		}
 	}
 
 	if (inputs.isKeyPressed(GLFW_KEY_U)) {
@@ -104,6 +141,10 @@ void Application::processKeyBindings() {
 	if (inputs.isKeyPressed(GLFW_KEY_T)) {
 		world.unloadLevel();
 		world.loadLevel("assets/levels/PhysicsTesting.json");
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_M)) {
+		world.unloadLevel();
+		world.loadLevel("assets/levels/MissileSim.json");
 	}
 }
 

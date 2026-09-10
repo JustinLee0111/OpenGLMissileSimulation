@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "core/Application.h"
 
 // Description: Unfinished missile simulation, currently a custom physics simulator for bouncing sphere on sphere, sphere on static bounded plane. Uses Continuous Collision Detection (CCD) to detect collisions.
 // The benefit of CCD is the ability to prevent high-speed tunneling (objects passing through one another) and calculating precise collisions.
@@ -21,6 +21,9 @@
 // U - Unload level
 // L - Load level
 // T - Load level with moving plane
+// M - Load missile level
+// Left Arrow - Rotate counter-clockwise
+// Right Arrow - Rotate clockwise
 
 using namespace std;
 

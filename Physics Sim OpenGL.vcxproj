@@ -161,44 +161,53 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Application.cpp" />
-    <ClCompile Include="src\AssetManager.cpp" />
-    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\core\Application.cpp" />
+    <ClCompile Include="src\core\AssetManager.cpp" />
+    <ClCompile Include="src\core\InputHandler.cpp" />
+    <ClCompile Include="src\core\LevelManager.cpp" />
+    <ClCompile Include="src\core\main.cpp" />
+    <ClCompile Include="src\core\PhysicsEngine.cpp" />
+    <ClCompile Include="src\environment\camera.cpp" />
+    <ClCompile Include="src\environment\Light.cpp" />
+    <ClCompile Include="src\environment\Object.cpp" />
+    <ClCompile Include="src\environment\PhysicsData.cpp" />
+    <ClCompile Include="src\environment\World.cpp" />
     <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\InputHandler.cpp" />
-    <ClCompile Include="src\LevelManager.cpp" />
-    <ClCompile Include="src\Light.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Mesh.cpp" />
-    <ClCompile Include="src\Model.cpp" />
-    <ClCompile Include="src\Object.cpp" />
-    <ClCompile Include="src\PhysicsData.cpp" />
-    <ClCompile Include="src\PhysicsEngine.cpp" />
-    <ClCompile Include="src\Renderer.cpp" />
-    <ClCompile Include="src\Shader.cpp" />
-    <ClCompile Include="src\triangle_mesh.cpp" />
-    <ClCompile Include="src\World.cpp" />
+    <ClCompile Include="src\missile\Missile.cpp" />
+    <ClCompile Include="src\missile\MissileSeeker.cpp" />
+    <ClCompile Include="src\rendering\Debugging.cpp" />
+    <ClCompile Include="src\primitives\triangle_mesh.cpp" />
+    <ClCompile Include="src\rendering\Mesh.cpp" />
+    <ClCompile Include="src\rendering\Model.cpp" />
+    <ClCompile Include="src\rendering\Renderer.cpp" />
+    <ClCompile Include="src\rendering\Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\glad\glad.h" />
-    <ClInclude Include="src\Application.h" />
-    <ClInclude Include="src\AssetManager.h" />
-    <ClInclude Include="src\camera.h" />
-    <ClInclude Include="src\InputHandler.h" />
-    <ClInclude Include="src\LevelManager.h" />
-    <ClInclude Include="src\Light.h" />
-    <ClInclude Include="src\Mesh.h" />
-    <ClInclude Include="src\Model.h" />
-    <ClInclude Include="src\Object.h" />
-    <ClInclude Include="src\PhysicsData.h" />
-    <ClInclude Include="src\PhysicsEngine.h" />
-    <ClInclude Include="src\Renderer.h" />
-    <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\core\Application.h" />
+    <ClInclude Include="src\core\AssetManager.h" />
+    <ClInclude Include="src\core\InputHandler.h" />
+    <ClInclude Include="src\core\LevelManager.h" />
+    <ClInclude Include="src\core\PhysicsEngine.h" />
+    <ClInclude Include="src\environment\camera.h" />
+    <ClInclude Include="src\environment\Light.h" />
+    <ClInclude Include="src\environment\Object.h" />
+    <ClInclude Include="src\environment\PhysicsData.h" />
+    <ClInclude Include="src\environment\World.h" />
+    <ClInclude Include="src\missile\Missile.h" />
+    <ClInclude Include="src\missile\MissileSeeker.h" />
+    <ClInclude Include="src\missile\MissileTracking.h" />
+    <ClInclude Include="src\rendering\Debugging.h" />
+    <ClInclude Include="src\primitives\triangle_mesh.h" />
+    <ClInclude Include="src\rendering\Mesh.h" />
+    <ClInclude Include="src\rendering\Model.h" />
+    <ClInclude Include="src\rendering\Renderer.h" />
+    <ClInclude Include="src\rendering\Shader.h" />
     <ClInclude Include="src\staticHeaders.h" />
-    <ClInclude Include="src\triangle_mesh.h" />
-    <ClInclude Include="src\World.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\debug.frag" />
+    <None Include="shaders\debug.vert" />
     <None Include="shaders\fragment.frag" />
     <None Include="shaders\vertex.vert" />
   </ItemGroup>

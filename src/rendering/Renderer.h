@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Shader.h"
-#include <vector>
+#include "rendering/Shader.h"
 #include <memory>
 
 class Object;
@@ -16,6 +15,9 @@ class Renderer {
 			shader->use();
 		}
 		void draw(const World& world, float aspectRatio);
+		Shader& getShader(){
+			return *shader;
+		}
 	private:
 		std::unique_ptr<Shader> shader;
 };

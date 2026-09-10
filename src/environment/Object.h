@@ -4,7 +4,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <memory>
 
-#include "PhysicsData.h"
+#include "environment/PhysicsData.h"
 
 class Model;
 
@@ -25,7 +25,6 @@ public:
 	Object() = default;
 	~Object() = default;
 
-	void draw() const;
 	glm::mat4 getObjectMatrix() const;
 
 	void rotate(glm::vec3 axis, float angle) {
@@ -35,8 +34,17 @@ public:
 	void setRotation(glm::vec3 axis, float angle) {
 		rotationQ = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
 	}
-	void addPhysics(bool enablePhysics = false, bool enableCollisions = true, bool isKinematic = false);
+	void addPhysics();
 	void removePhysics() {
 		if (physicsProperties) physicsProperties = nullptr;
 	}
+
+	void addChild(Object* child) {
+		children.push_back(child);
+		child->parent = this;
+	}
+
+	private:
+		std::vector<Object*> children;
+		Object* parent = nullptr;
 };

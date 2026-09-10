@@ -1,8 +1,9 @@
 #include <glad/glad.h>
 
-#include "Mesh.h"
+#include "rendering/Mesh.h"
 
 Mesh::Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices) {
+	isTransparent = (vertices[0].color.a < 1.0f) ? true : false;
 	indexCount = (unsigned int)indices.size();
 	// Generate buffers
 	glGenVertexArrays(1, &VAO);
@@ -39,7 +40,9 @@ Mesh::Mesh(Mesh&& other) noexcept :
 	VBO(other.VBO),
 	VAO(other.VAO),
 	EBO(other.EBO),
-	indexCount(other.indexCount)
+	indexCount(other.indexCount),
+	isTransparent(other.isTransparent)
+
 {
 	other.VBO = 0;
 	other.VAO = 0;
@@ -54,6 +57,7 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 		VBO = other.VBO;
 		EBO = other.EBO;
 		indexCount = other.indexCount;
+		isTransparent = other.isTransparent;
 
 		other.VAO = 0;
 		other.VBO = 0;

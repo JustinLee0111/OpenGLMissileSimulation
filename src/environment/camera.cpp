@@ -1,6 +1,6 @@
 #include <glm/gtc/quaternion.hpp>
 
-#include "camera.h"
+#include "environment/camera.h"
 
 // Updates the camera rotation based on X and Y angles
 void Camera::cameraRotate(float xAngle, float yAngle) {

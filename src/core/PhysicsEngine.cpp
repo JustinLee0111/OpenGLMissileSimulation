@@ -1,10 +1,8 @@
-#include "PhysicsEngine.h"
-#include "Object.h"
-#include "PhysicsData.h"
+#include "core/PhysicsEngine.h"
+#include "environment/Object.h"
+#include "environment/PhysicsData.h"
 
 #include <iostream>
-#include <cassert>
-#include <cmath>
 
 const float PhysicsEngine::deltaTime = (1.0f / 60.0f);
 
@@ -49,7 +47,7 @@ void PhysicsEngine::update() {
 void PhysicsEngine::kinematicUpdater(float timeLeft) {
 	if (timeLeft <= 0.0f) return;
 	for (auto& object : physObjects) {
-		if (!object || !object->physicsProperties || !object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f) continue;
+		if (!object || !object->physicsProperties || !object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f || object->physicsProperties->isStatic) continue;
 
 		// Calculates how much to move
 		float oldOffset = (std::sin(object->physicsProperties->accumulatedTime) * object->physicsProperties->moveDistance);
@@ -101,7 +99,7 @@ std::vector<HitData> PhysicsEngine::earliestCollision(float timeLeft) {
 // Updates position based on position equation
 void PhysicsEngine::positionUpdater(float hitTime) {
 	for (auto& object : physObjects) {
-		if (!object || !object->physicsProperties || object->physicsProperties->mass <= 0.0f) continue;
+		if (!object || !object->physicsProperties || object->physicsProperties->mass <= 0.0f || object->physicsProperties->isStatic) continue;
 
 		if (object->physicsProperties->enableGravity) {
 			object->position += object->physicsProperties->velocity * hitTime + 0.5f * gravity * hitTime * hitTime;
@@ -110,7 +108,12 @@ void PhysicsEngine::positionUpdater(float hitTime) {
 			object->position += object->physicsProperties->velocity * hitTime;
 		}
 
-		// Not implemented yet, for future use during rotating collisions
+		glm::vec3 angVel = object->physicsProperties->angularVelocity;
+		float rotateAngle = glm::length(angVel) * hitTime;
+		if (rotateAngle > 0.0f) {
+			object->rotate(glm::normalize(angVel), glm::degrees(rotateAngle));
+		}
+		
 		object->normal = object->rotationQ * glm::vec3{ 0.0f, 1.0f, 0.0f };
 		object->left = object->rotationQ * glm::vec3{ 1.0f, 0.0f, 0.0f };
 		object->front = object->rotationQ * glm::vec3{ 0.0f, 0.0f, 1.0f };
@@ -122,7 +125,7 @@ void PhysicsEngine::positionUpdater(float hitTime) {
 void PhysicsEngine::forcesUpdater(float timeLeft) {
 	if (timeLeft <= 0.0f) return;
 	for (auto& object : physObjects) {
-		if (!object || !object->physicsProperties || object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f) continue;
+		if (!object || !object->physicsProperties || object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f || object->physicsProperties->isStatic) continue;
 		glm::vec3 acceleration = object->physicsProperties->totalForces / object->physicsProperties->mass;
 		if (object->physicsProperties->enableGravity) {
 			acceleration += gravity;
@@ -174,8 +177,6 @@ void PhysicsEngine::planeCollision(HitData& hitData){ // Resolves plane and sphe
 	else{ // Grounded state
 		sphere->physicsProperties->velocity -= normalSpeed * hitData.normal;
 	}
-	assert(!std::isnan(sphere->position.x) && !std::isinf(sphere->position.x));
-	assert(!std::isnan(sphere->physicsProperties->velocity.x) && !std::isinf(sphere->physicsProperties->velocity.x));
 }
 
 // Continuous Collision Detection (CCD)
@@ -309,8 +310,8 @@ void PhysicsEngine::sphereCollision(HitData& hitData) {
 	float normalSpeed = glm::dot(hitData.relativeVelocity, hitData.normal);
 	float collisionPenetration = hitData.distance - sphere1->physicsProperties->radius - sphere2->physicsProperties->radius;
 
-	float sphere1InverseMass = 1.0f / sphere1->physicsProperties->mass;
-	float sphere2InverseMass = 1.0f / sphere2->physicsProperties->mass;
+	float sphere1InverseMass = (sphere1->physicsProperties->isStatic) ? 0.0f : 1.0f / sphere1->physicsProperties->mass;
+	float sphere2InverseMass = (sphere2->physicsProperties->isStatic) ? 0.0f : 1.0f / sphere2->physicsProperties->mass;
 	float totalInverseMass = sphere1InverseMass + sphere2InverseMass;
 
 	if (collisionPenetration < -threshold) { // Incase of floating point error, corrects it

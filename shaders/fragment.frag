@@ -12,8 +12,13 @@ uniform vec4 lightColor;
 uniform vec3 lightPos;
 uniform float ambientLightStrength;
 uniform vec3 camPos;
+uniform bool lightingEnable;
 
 void main(){
+	if(!lightingEnable){
+		screenColor = fragmentColor;
+		return;
+	}
 	vec3 norm = normalize(normal); // Renormalizing the normal for redundancy/accuracy
 	vec3 vertexToCamNorm = normalize(camPos - curVertexPos); // Normalized vector from vertex -> cam
 	vec3 lightToVertexNorm = normalize(curVertexPos - lightPos); // Normalized vector from light source -> vertex

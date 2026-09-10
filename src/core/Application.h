@@ -2,9 +2,10 @@
 
 #include <GLFW/glfw3.h>
 
-#include "World.h"
-#include "Renderer.h"
-#include "InputHandler.h"
+#include "environment/World.h"
+#include "rendering/Renderer.h"
+#include "core/InputHandler.h"
+#include "rendering/Debugging.h"
 
 class Application {
 	public:
@@ -34,9 +35,11 @@ class Application {
 	private:
 		GLFWwindow* mainWindow = nullptr;
 		World world;
+		Debugging debug;
 		Renderer appRenderer;
 		InputHandler inputs;
 		int windowWidth = 1920;
 		int windowHeight = 1440;
 		float accumulator = 0.0f;
+		bool debugEnabled = true;
 };

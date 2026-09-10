@@ -1,7 +1,7 @@
-#include "World.h"
-#include "AssetManager.h"
-#include "InputHandler.h"
-#include "LevelManager.h"
+#include "environment/World.h"
+#include "core/AssetManager.h"
+#include "core/InputHandler.h"
+#include "core/LevelManager.h"
 
 Camera* World::currentCamera = nullptr;
 
@@ -11,19 +11,38 @@ void World::worldInit() {
 }
 
 // Creates an object and constructs it based on inputted parameters
-Object* World::spawnObject(const std::string& filepath, bool enablePhysics, bool enableGravity, bool enableCollisions, bool isKinematic) {
+Object* World::spawnObject(const std::string& filepath) {
 	auto obj = std::make_unique<Object>();
 	obj->model = AssetManager::loadModel(filepath);
 	Object* ptr = obj.get();
-
-	if (enablePhysics) {
-		ptr->addPhysics(enableGravity, enableCollisions, isKinematic);
-		physicsEngine.addPhysObject(ptr);
-	}
+	ptr->addPhysics();
+	physicsEngine.addPhysObject(ptr);
 
 	objects.push_back(std::move(obj));
 	return ptr;
 }
+
+Missile* World::spawnMissile(const std::string& filepath) {
+	auto obj = std::make_unique<Missile>();
+	obj->model = AssetManager::loadModel(filepath);
+	Missile* ptr = obj.get();
+	ptr->addPhysics();
+	physicsEngine.addPhysObject(ptr);
+
+	missiles.push_back(std::move(obj));
+	return ptr;
+}
+
+/*Object* World::spawnObject(std::string name, VertexData& vertexData) {
+	auto obj = std::make_unique<Object>();
+	obj->model = AssetManager::loadModel(name, vertexData.vertices, vertexData.indices, vertexData.color);
+	Object* ptr = obj.get();
+	ptr->addPhysics();
+	physicsEngine.addPhysObject(ptr);
+
+	objects.push_back(std::move(obj));
+	return ptr;
+}*/
 
 void World::loadLevel(const std::string& filepath) {
 	LevelManager::loadLevel(filepath, *this);
@@ -53,6 +72,9 @@ Light* World::createLight(glm::vec3 lightPos, glm::vec4 lightColor) {
 	return lightPtr;
 }
 
-void World::update(const InputHandler& inputs){
+void World::update(){
 	physicsEngine.update();
+	for (auto& missile : missiles) {
+		missile->update(*this, physicsEngine.getPhysicsRate());
+	}
 }

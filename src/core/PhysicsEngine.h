@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include <object.h>
+#include <environment/Object.h>
 
 struct HitData {
 	Object* objectHit = nullptr;

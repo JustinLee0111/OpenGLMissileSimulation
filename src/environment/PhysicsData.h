@@ -13,15 +13,17 @@ struct PhysicsData{
 	float planeHeight = 2.0f;
 
 	// Simulation Bools
-	bool enableGravity = true;
+	bool enableGravity = false;
 	bool enableCollisions = true;
-	bool isStatic = true;
+	bool isStatic = false;
 	bool isGrounded = false;
 	bool isKinematic = false;
 
 	// Physics Vectors
 	glm::vec3 velocity{ 0.0f };
 	glm::vec3 totalForces{ 0.0f };
+	
+	glm::vec3 angularVelocity{ 0.0f };
 
 	ColliderType collider = ColliderType::Sphere;
 
@@ -31,15 +33,20 @@ struct PhysicsData{
 	float moveSpeed = 1.0f;
 	float accumulatedTime = 0.0f;
 
-	PhysicsData(bool enableGravity, bool enableCollisions, bool isKinematic) :
+	PhysicsData(bool enableGravity, bool enableCollisions, bool isKinematic, bool isStatic) :
 		enableGravity(enableGravity),
 		enableCollisions(enableCollisions),
-		isKinematic(isKinematic){}
+		isKinematic(isKinematic),
+		isStatic(isStatic)
+	{}
 
 	PhysicsData() = default;
 
 	void addForce(const glm::vec3& force) {
 		totalForces += force;
+	}
+	void addTorque(const glm::vec3& torque) {
+
 	}
 	void zeroForces() {
 		totalForces = glm::vec3{ 0.0f };

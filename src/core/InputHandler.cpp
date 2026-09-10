@@ -1,5 +1,5 @@
-#include "InputHandler.h"
-#include "World.h"
+#include "core/InputHandler.h"
+#include "environment/World.h"
 
 void InputHandler::init(GLFWwindow* window) {
 	glfwGetWindowSize(window, &windowWidth, &windowHeight);

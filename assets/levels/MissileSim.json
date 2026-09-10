@@ -1,0 +1,34 @@
+{
+  "levelName": "MissileSim",
+  "cameras": [
+    {
+      "cameraName": "mainCamera",
+      "position": [ 0.0, 2.0, 20.0 ],
+      "yaw": 0.0,
+      "pitch" : 0.0
+    }
+  ],
+  "objects": [
+    {
+      "objectName": "missile",
+      "modelPath": "assets/models/sphere.obj",
+      "gravity": true,
+      "position": [ -10.0, 2.0, 0.0 ],
+      "collider": "Sphere",
+      "restitution": 0.5,
+      "rotation": {
+        "axis": [ 0, 1, 0 ],
+        "angle": 90.0
+      }
+    },
+    {
+      "objectName": "target",
+      "modelPath": "assets/models/sphere.obj",
+      "gravity": false,
+      "isStatic" : true,
+      "position": [ 10.0, 0.0, 0.0 ],
+      "collider": "Sphere",
+      "restitution": 0.5
+    }
+  ]
+}

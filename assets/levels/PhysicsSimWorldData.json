@@ -12,7 +12,6 @@
     {
       "objectName": "sphere1",
       "modelPath": "assets/models/sphere.obj",
-      "physics": true,
       "gravity": true,
       "position": [ -1.5, 2.0, 0.0 ],
       "collider": "Sphere",
@@ -21,7 +20,6 @@
     {
       "objectName": "sphere2",
       "modelPath": "assets/models/sphere.obj",
-      "physics": true,
       "gravity": true,
       "position": [ 1.5, 2.0, 0.0 ],
       "collider": "Sphere",
@@ -30,7 +28,6 @@
     {
       "objectName": "bottomLeftFloor",
       "modelPath": "assets/models/plane.obj",
-      "physics": true,
       "gravity": false,
       "position": [ -1.5, 0.0, 0.0 ],
       "collider": "Plane",
@@ -43,7 +40,6 @@
     {
       "objectName": "bottomRightFloor",
       "modelPath": "assets/models/plane.obj",
-      "physics": true,
       "gravity": false,
       "position": [ 1.5, 0.0, 0.0 ],
       "collider": "Plane",
@@ -56,7 +52,6 @@
     {
       "objectName": "bottomRightWall",
       "modelPath": "assets/models/plane.obj",
-      "physics": true,
       "gravity": false,
       "position": [ 3.0, 1.0, 0.0 ],
       "collider": "Plane",
@@ -69,7 +64,6 @@
     {
       "objectName": "topRightWall",
       "modelPath": "assets/models/plane.obj",
-      "physics": true,
       "gravity": false,
       "position": [ 3.0, 4.0, 0.0 ],
       "collider": "Plane",
@@ -82,7 +76,6 @@
     {
       "objectName": "bottomLeftWall",
       "modelPath": "assets/models/plane.obj",
-      "physics": true,
       "gravity": false,
       "position": [ -3.0, 1.0, 0.0 ],
       "collider": "Plane",
@@ -95,7 +88,6 @@
     {
       "objectName": "topLeftWall",
       "modelPath": "assets/models/plane.obj",
-      "physics": true,
       "gravity": false,
       "position": [ -3.0, 4.0, 0.0 ],
       "collider": "Plane",
@@ -108,7 +100,6 @@
     {
       "objectName": "topLeftRoof",
       "modelPath": "assets/models/plane.obj",
-      "physics": true,
       "gravity": false,
       "position": [ -1.5, 5.0, 0.0 ],
       "collider": "Plane",
@@ -121,7 +112,6 @@
     {
       "objectName": "topRightRoof",
       "modelPath": "assets/models/plane.obj",
-      "physics": true,
       "gravity" : false,
       "position": [ 1.5, 5.0, 0.0 ],
       "collider": "Plane",

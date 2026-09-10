@@ -4,9 +4,10 @@
 #include <memory>
 #include <string>
 
-#include "PhysicsEngine.h"
-#include "camera.h"
-#include "Light.h"
+#include "core/PhysicsEngine.h"
+#include "environment/camera.h"
+#include "environment/Light.h"
+#include "missile/Missile.h"
 
 class InputHandler;
 class Object;
@@ -25,13 +26,17 @@ public:
 	std::vector<std::unique_ptr<Object>> objects;
 	std::vector<std::unique_ptr<Camera>> cameras;
 	std::vector<std::unique_ptr<Light>> lights;
+	std::vector<std::unique_ptr<Missile>> missiles;
 	static Camera* currentCamera;
 
 	World() = default;
 
 	void worldInit();
 
-	Object* spawnObject(const std::string& filepath, bool enablePhysics = false, bool enableGravity = true, bool enableCollisions = true, bool isKinematic = false);
+	Object* spawnObject(const std::string& filepath);
+	Missile* spawnMissile(const std::string& filepath);
+
+	//Object* spawnObject(std::string name, VertexData& vertexData);
 
 	Camera* createCamera(glm::vec3 cameraPosition = glm::vec3{0.0f});
 
@@ -53,7 +58,7 @@ public:
 	void loadLevel(const std::string& filepath);
 	void unloadLevel();
 
-	void update(const InputHandler& inputs);
+	void update();
 
 	float getPhysicsRate() const{
 		return physicsEngine.getPhysicsRate();

@@ -7,7 +7,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Shader.h"
+#include "rendering/Shader.h"
 
 using namespace std;
 
@@ -135,6 +135,15 @@ void Shader::setFloat(const std::string& name, const float& value) const {
 		return;
 	}
 	glUniform1fv(loc, 1, &value);
+}
+
+void Shader::setBool(const std::string& name, const bool& value) const {
+	int loc = glGetUniformLocation(shaderID, name.c_str());
+	if (loc == -1) {
+		std::cout << "ERROR SETTING FLOAT: " << name << std::endl;
+		return;
+	}
+	glUniform1i(loc, static_cast<int>(value));
 }
 
 Shader::~Shader() {
