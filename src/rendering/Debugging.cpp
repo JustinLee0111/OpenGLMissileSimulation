@@ -3,7 +3,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-#include <glad/glad.h>
 
 #include "rendering/Debugging.h"
 #include "Shader.h"
@@ -16,16 +15,20 @@ World* Debugging::world = nullptr;
 float Debugging::aspectRatio{ 0.0f };
 
 void Debugging::cone(glm::vec3 position, glm::vec3 direction) {
-	debugShader->use();
-	const glm::mat4 view = world->currentCamera->getViewMatrix();
-	const glm::mat4 projection = world->currentCamera->getProjectionMatrix(aspectRatio);
-	debugShader->setMat4("view", view);
-	debugShader->setMat4("projection", projection);
+	drawWrapper();
 
 	glm::quat orientation = glm::quatLookAt(glm::normalize(direction), glm::vec3{ 0.0f, 1.0f, 0.0f });
 	glm::mat4 matrix = glm::translate(glm::mat4(1.0f), position) * glm::mat4_cast(orientation);
 	debugShader->setMat4("model", matrix); // Sends object position and orientation to shader
 	debugCone->drawTransparent(); // Draws the model through all meshes being drawn
+}
+
+void Debugging::drawWrapper() {
+	debugShader->use();
+	const glm::mat4 view = world->currentCamera->getViewMatrix();
+	const glm::mat4 projection = world->currentCamera->getProjectionMatrix(aspectRatio);
+	debugShader->setMat4("view", view);
+	debugShader->setMat4("projection", projection);
 }
 
 void Debugging::createCone(float angle, float length, glm::vec4 color) {
@@ -60,5 +63,5 @@ void Debugging::Init(World* world, float aspectRatio) {
 	this->aspectRatio = aspectRatio;
 	debugShader = std::make_unique<Shader>("shaders/debug.vert", "shaders/debug.frag");
 	debugShader->use();
-	createCone(45.0f, 100.0f, glm::vec4{ 1.0f, 1.0f, 1.0f, 0.25f });
+	createCone(45.0f, 100.0f, glm::vec4{ 1.0f, 1.0f, 1.0f, 0.25f }); // Currently hardcoded so missile FOV changes don't work
 }

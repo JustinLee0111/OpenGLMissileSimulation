@@ -52,6 +52,7 @@ void World::loadLevel(const std::string& filepath) {
 void World::unloadLevel() {
 	objects.clear();
 	cameras.clear();
+	missiles.clear();
 	physicsEngine.physObjects.clear();
 	AssetManager::clearCache();
 	currentCamera = nullptr;

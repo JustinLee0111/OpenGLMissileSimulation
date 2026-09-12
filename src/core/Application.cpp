@@ -68,8 +68,12 @@ void Application::runApp(){
 		if (world.currentCamera) {
 			appRenderer.draw(world, getAspectRatio());
 		}
-		for (auto& missile : world.missiles) {
-			Debugging::cone(missile->position, missile->front);
+		for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
+			glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
+			glm::quat seekerQ = glm::quat(glm::vec3{ missile->getSeeker().verticalAngle, missile->getSeeker().horizontalAngle, 0.0f });
+			glm::vec3 localLookDirection = seekerQ * forward; // Convert local to world look direction vector
+			glm::vec3 worldLookDirection = (missile->rotationQ * seekerQ) * forward; // Convert local to world look direction vector
+			Debugging::cone(missile->position, worldLookDirection);
 		}
 
 		inputs.keysUpdate();

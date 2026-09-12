@@ -21,6 +21,7 @@ class Debugging {
 		static void cone(glm::vec3 position, glm::vec3 direction);
 	private:
 		static void createCone(float angle, float length, glm::vec4 color);
+		static void drawWrapper();
 		static std::unique_ptr<Shader> debugShader;
 		static std::shared_ptr<Model> debugCone;
 		static World* world;

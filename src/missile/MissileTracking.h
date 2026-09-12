@@ -5,5 +5,4 @@
 
 class MissileTracking {
 	public:
-		//void sensorScan();
 };

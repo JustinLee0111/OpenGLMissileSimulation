@@ -5,7 +5,10 @@
 
 **<u>Description:</u>**
 
-Project to learn OpenGL and refine C++ coding skills. Currently a custom collision physics simulator using Continuous Collision Detection with spheres and bounded planes.
+- Unfinished missile simulation, currently a custom physics simulator for bouncing sphere on sphere, sphere on static bounded plane. Uses Continuous Collision Detection (CCD) to detect collisions.
+- The benefit of CCD is the ability to prevent high-speed tunneling (objects passing through one another) and calculating precise collisions.
+- The biggest challenge of CCD is calculating the Time of Impact (TOI). Two methods used is Analytical and Conservative Advancement.
+- Analyical solving is much faster but not as reliable and flexible as Conservative Advancement.
 
 **<u>--- CONTROLS ---</u>**
 - Left Alt - Lock/Unlock Camera to Mouse
@@ -15,12 +18,11 @@ Project to learn OpenGL and refine C++ coding skills. Currently a custom collisi
 - S - Add down velocity to sphere
 - D - Add right velocity to sphere
 - U - Unload level
-<<<<<<< HEAD
 - L - Load level
 - T - Load level with moving plane
-=======
-- L - Load level (MAY GET LAGGY IF SPAMMED)
->>>>>>> 7c29968b7aac8d07a0ea5a5b471db9a1ee476f35
+- M - Load missile level
+- Left Arrow - Rotate counter-clockwise
+- Right Arrow - Rotate clockwise
   
   **<u>-- FEATURES --</u>**
 - Continuous Collision Detection solver with both conservative advancement and analytical Time of Impact (TOI) solver.
@@ -32,13 +34,9 @@ Project to learn OpenGL and refine C++ coding skills. Currently a custom collisi
 
 Basic ball physics simulation
 
-  
-
 **<u>Endgoal:</u>**
 
 A basic lightweight missile simulation using OpenGL. Simulates infrared target tracking, working aerodynamics, IRCCM, thrust vectoring, and proximity fuse.
-
-  
 
 **<u>Requirements</u>**
 

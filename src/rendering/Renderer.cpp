@@ -42,7 +42,6 @@ void Renderer::draw(const World& world, float aspectRatio){
 
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
-	glDisable(GL_CULL_FACE);
 
 	shader->setBool("lightingEnable", false);
 	for (const auto& obj : world.objects) {
@@ -59,6 +58,5 @@ void Renderer::draw(const World& world, float aspectRatio){
 	}
 
 	glDepthMask(GL_TRUE);
-	glEnable(GL_CULL_FACE);
 	shader->setBool("lightingEnable", true);
 }
