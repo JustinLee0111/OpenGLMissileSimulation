@@ -14,16 +14,20 @@
 // --- CONTROLS ---
 // Left Alt - Lock/Unlock Camera to Mouse
 // Escape - Exit Program
+// 
 // W - Add up velocity
 // A - Add left velocity
 // S - Add down velocity
 // D - Add right velocity
+// Left Arrow - Rotate counter-clockwise
+// Right Arrow - Rotate clockwise
+// R - Disable/Enable Missile Seeker
+// 
 // U - Unload level
 // L - Load level
 // T - Load level with moving plane
 // M - Load missile level
-// Left Arrow - Rotate counter-clockwise
-// Right Arrow - Rotate clockwise
+
 
 using namespace std;
 

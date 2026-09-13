@@ -21,3 +21,11 @@ std::shared_ptr<Model> AssetManager::loadModel(std::string name, std::vector<glm
 	modelCache[name] = model;
 	return model;
 }
+
+void AssetManager::deleteModel(const std::string& key) {
+	auto foundModel = modelCache.find(key);
+	if (foundModel != modelCache.end()) {
+		foundModel->second.lock()->deleteModel();
+		modelCache.erase(key);
+	}
+}

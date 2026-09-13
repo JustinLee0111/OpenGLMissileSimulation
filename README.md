@@ -17,22 +17,24 @@
 - A - Add left velocity to sphere
 - S - Add down velocity to sphere
 - D - Add right velocity to sphere
+- Left Arrow - Rotate counter-clockwise
+- Right Arrow - Rotate clockwise
+- R - Enable/Disable Missile Seeker
 - U - Unload level
 - L - Load level
 - T - Load level with moving plane
 - M - Load missile level
-- Left Arrow - Rotate counter-clockwise
-- Right Arrow - Rotate clockwise
   
   **<u>-- FEATURES --</u>**
 - Continuous Collision Detection solver with both conservative advancement and analytical Time of Impact (TOI) solver.
 - Bounded plane collisions with dynamic normals for edge collisions (only for sphere and plane collisions).
 - Sphere on sphere collisions using impulses
 - Dynamic level loading with JSON level data
+- Seeker object tracking with gimbal limits
 
 **<u>Currently:</u>**
 
-Basic ball physics simulation
+Basic ball physics simulation and missile seeker sim
 
 **<u>Endgoal:</u>**
 

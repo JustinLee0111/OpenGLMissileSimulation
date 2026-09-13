@@ -10,6 +10,7 @@ class AssetManager {
 	public:
 		static std::shared_ptr<Model> loadModel(const std::string& filepath);
 		static std::shared_ptr<Model> loadModel(std::string name, std::vector<glm::vec3>& vertices, std::vector<unsigned int>& indices, glm::vec4& color);
+		static void deleteModel(const std::string& key);
 
 		~AssetManager() { clearCache(); }
 

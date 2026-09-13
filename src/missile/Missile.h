@@ -15,6 +15,10 @@ class Missile : public Object {
 		const MissileSeeker getSeeker() const{
 			return seeker;
 		}
+
+		void changeSeekerEnable() {
+			seeker.seekerEnabled = !seeker.seekerEnabled;
+		}
 	private:
 		MissileSeeker seeker;
 		MissileTracking tracking;

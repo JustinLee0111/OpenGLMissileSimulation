@@ -12,7 +12,7 @@
     {
       "objectName": "missile",
       "modelPath": "assets/models/sphere.obj",
-      "gravity": true,
+      "gravity": false,
       "position": [ -10.0, 2.0, 0.0 ],
       "collider": "Sphere",
       "restitution": 0.5,
