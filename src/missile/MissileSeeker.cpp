@@ -5,6 +5,7 @@
 #include "rendering/Debugging.h"
 #include "environment/World.h"
 #include "environment/Object.h"
+#include "core/InputHandler.h"
 
 #include <iostream>
 #include <memory>
@@ -12,11 +13,12 @@
 
 void MissileSeeker::update(const World& world, Missile& missile, float deltaTime){
 	if (curState != SeekerState::Off) {
-		scan(world, missile);
+		scan(world, missile, deltaTime);
 		updateSeekerState();
 		if (curState == SeekerState::Tracking) {
 			seekerOrientation = glm::normalize(curSeekerData.rotateToTarget * seekerOrientation); // Updates the rotation for seeker to point towards target
 			clampGimbal(missile);
+			std::cout << "LOS Rate: " << glm::length( curSeekerData.losRate ) << std::endl;
 		}
 	}
 	else if(curState == SeekerState::Off){
@@ -52,7 +54,7 @@ void MissileSeeker::clampGimbal(Missile& missile) {
 	}
 }
 
-void MissileSeeker::scan(const World& world, Missile& missile){
+void MissileSeeker::scan(const World& world, Missile& missile, float& deltaTime){
 	glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
 
 	glm::vec3 localLookDirection = seekerOrientation * forward; // Makes the seeker look direction
@@ -75,9 +77,19 @@ void MissileSeeker::scan(const World& world, Missile& missile){
 		if (distanceFovCenterToObj < radiusAtDistance + obj->physicsProperties->radius) {
 			curSeekerData.tracking = true;
 		
-			missileToObj = glm::normalize( glm::conjugate(missile.rotationQ) * missileToObj ); // Converts the object coordinates to the missile's local space then the seeker's local space
+			missileToObj = glm::normalize( glm::conjugate(missile.rotationQ) * missileToObj ); // Converts the target's coordinates to the missile's local space then the seeker's local space
 
-			curSeekerData.rotateToTarget = glm::rotation(localLookDirection, missileToObj); // Gets the quaternion to rotate the current seeker quaternion to the target
+			// LOS CALCULATIONS
+			glm::vec3 rotationAxis = glm::cross(missileToObj, localLookDirection);
+			float rotateAngle = glm::asin( glm::length(rotationAxis) ) ;
+			glm::vec3 losRate = (glm::normalize(rotationAxis) * rotateAngle) / deltaTime;
+			curSeekerData.losRate = (glm::length(losRate) > 0.0001f) ? losRate : glm::vec3{ 0.0f }; // Filter out negligible losRate
+
+
+			// SEEKER ROTATION
+			glm::quat rotate = glm::normalize( glm::rotation(localLookDirection, missileToObj) );
+			curSeekerData.rotateToTarget = rotate; // Gets the quaternion to rotate the current seeker quaternion to the target
+
 			return;
 		}
 	}

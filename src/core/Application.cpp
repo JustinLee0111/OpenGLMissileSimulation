@@ -135,6 +135,9 @@ void Application::processKeyBindings() {
 		if (inputs.isKeyPressed(GLFW_KEY_R)) {
 			world.missiles[0]->changeSeekerEnable();
 		}
+		if (inputs.isKeyPressed(GLFW_KEY_L)) {
+			world.missiles[0]->storeReferenceFrame();
+		}
 
 		/*if (inputs.isKeyPressed(GLFW_KEY_SPACE)) {
 			world.missiles[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 5.0f, 0.0f };

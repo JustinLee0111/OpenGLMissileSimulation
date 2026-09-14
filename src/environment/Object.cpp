@@ -10,7 +10,7 @@ void Object::addPhysics() {
 	if (!physicsProperties) physicsProperties = std::make_unique<PhysicsData>();
 }
 
-glm::mat4 Object::getObjectMatrix() const {
+const glm::mat4 Object::getObjectMatrix() const {
 	if (parent) {
 		glm::mat4 child = glm::translate(glm::mat4(1.0f), position) * glm::mat4_cast(rotationQ);
 		return parent->getObjectMatrix() * child;

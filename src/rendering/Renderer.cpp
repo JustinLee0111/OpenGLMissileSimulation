@@ -30,12 +30,14 @@ void Renderer::draw(const World& world, float aspectRatio){
 	for (const auto& obj : world.objects) {
 		if (obj->model) {
 			shader->setMat4("model", obj->getObjectMatrix()); // Sends object position and orientation to shader
+			shader->setVec3("scale", obj->scale);
 			obj->model->drawOpaque(); // Draws the model through all meshes being drawn
 		}
 	}
 	for (const auto& obj : world.missiles) {
 		if (obj->model) {
 			shader->setMat4("model", obj->getObjectMatrix()); // Sends object position and orientation to shader
+			shader->setVec3("scale", obj->scale);
 			obj->model->drawOpaque(); // Draws the model through all meshes being drawn
 		}
 	}
@@ -47,12 +49,14 @@ void Renderer::draw(const World& world, float aspectRatio){
 	for (const auto& obj : world.objects) {
 		if (obj->model) {
 			shader->setMat4("model", obj->getObjectMatrix()); // Sends object position and orientation to shader
+			shader->setVec3("scale", obj->scale);
 			obj->model->drawTransparent(); // Draws the model through all meshes being drawn
 		}
 	}
 	for (const auto& obj : world.missiles) {
 		if (obj->model) {
 			shader->setMat4("model", obj->getObjectMatrix()); // Sends object position and orientation to shader
+			shader->setVec3("scale", obj->scale);
 			obj->model->drawTransparent(); // Draws the model through all meshes being drawn
 		}
 	}

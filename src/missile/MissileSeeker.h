@@ -37,7 +37,11 @@ public:
 
 	glm::quat seekerOrientation{ 1.0f, 0.0f, 0.0f, 0.0f }; // Local seeker quaternion
 
-	const float slewRate{ 0.0f };
+	glm::quat referenceFrame{ 1.0f, 0.0f, 0.0f ,0.0f }; // Frozen reference spatial frame for losRate calculations when missile is fired
+
+	glm::vec3 seekerAngVel{ 0.0f };
+
+	const float maxSlewRate{ glm::radians(100.0f) }; // Radians per second
 	const float gimbalLimit{ glm::pi<float>() / 2.0f}; // In radians, total gimbal range. NOT FROM MISSILE BORESIGHT
 	const float maxRange{ 100.0f };
 	const float recenterDelay{ 0.0f };
@@ -50,13 +54,19 @@ public:
 
 	void clampGimbal(Missile& missile);
 
-	void scan(const World& world, Missile& missile);
+	void scan(const World& world, Missile& missile, float& deltaTime);
+
+	void storeReferenceFrame() {
+		referenceFrame = seekerOrientation;
+		referenceFrameFrozen = true;
+	}
 
 	const bool getSeekerOn() const {
 		return seekerEnabled;
 	}
 
 	bool seekerEnabled = true;
+	bool referenceFrameFrozen = false;
 private:
 	SeekerData curSeekerData;
 };

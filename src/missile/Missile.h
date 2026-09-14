@@ -19,6 +19,10 @@ class Missile : public Object {
 		void changeSeekerEnable() {
 			seeker.seekerEnabled = !seeker.seekerEnabled;
 		}
+
+		void storeReferenceFrame() {
+			seeker.storeReferenceFrame();
+		}
 	private:
 		MissileSeeker seeker;
 		MissileTracking tracking;

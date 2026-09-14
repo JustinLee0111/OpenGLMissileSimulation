@@ -11,9 +11,10 @@ out vec3 curVertexPos;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform vec3 scale;
 
 void main(){
-	gl_Position = projection * view * model * vec4(vertexPos, 1.0);
+	gl_Position = projection * view * model * ( vec4(vertexPos, 1.0) * vec4(scale, 1.0) );
 	fragmentColor = vertexColor;
 	normal = mat3(model) * vertexNormal;
 	curVertexPos = vec3(model * vec4(vertexPos, 1.0f)); // Gets the vertex positions in world space
