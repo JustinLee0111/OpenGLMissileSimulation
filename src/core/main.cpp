@@ -1,11 +1,13 @@
 #include "core/Application.h"
 
-// Description: Unfinished missile simulation, currently a custom physics simulator for bouncing sphere on sphere, sphere on static bounded plane. Uses Continuous Collision Detection (CCD) to detect collisions.
+// Description: Working basic missile simulation combined with a custom physics simulator for bouncing sphere on sphere and sphere on bounded plane. Uses Continuous Collision Detection (CCD) to detect collisions.
+// Using proportional navigation to guide the missile.
 // The benefit of CCD is the ability to prevent high-speed tunneling (objects passing through one another) and calculating precise collisions.
 // The biggest challenge of CCD is calculating the Time of Impact (TOI). Two methods used is Analytical and Conservative Advancement.
 // Analyical solving is much faster but not as reliable and flexible as Conservative Advancement.
 // 
 // <-- FEATURES -->
+// - Proportional navigation guided missile
 // - Continuous Collision Detection solver with both conservative advancement and analytical solver.
 // - Bounded plane collisions with dynamic normals for edge collisions (only for sphere and plane collisions).
 // - Sphere on sphere collisions using impulses
@@ -15,18 +17,20 @@
 // Left Alt - Lock/Unlock Camera to Mouse
 // Escape - Exit Program
 // 
-// W - Add up velocity
+// W - Add forward velocity
 // A - Add left velocity
-// S - Add down velocity
+// S - Add back velocity
 // D - Add right velocity
 // Left Arrow - Rotate counter-clockwise
 // Right Arrow - Rotate clockwise
 // R - Disable/Enable Missile Seeker
 // 
 // U - Unload level
+// M - Load missile level
+// N - Load slower missile level
+// B - Load alternate slower missile level
 // L - Load level
 // T - Load level with moving plane
-// M - Load missile level
 
 
 using namespace std;

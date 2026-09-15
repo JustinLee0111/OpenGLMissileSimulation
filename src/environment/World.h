@@ -26,7 +26,7 @@ public:
 	std::vector<std::unique_ptr<Object>> objects;
 	std::vector<std::unique_ptr<Camera>> cameras;
 	std::vector<std::unique_ptr<Light>> lights;
-	std::vector<std::unique_ptr<Missile>> missiles;
+	std::vector<Missile*> missiles;
 	static Camera* currentCamera;
 
 	World() = default;

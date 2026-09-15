@@ -1,6 +1,4 @@
-#include <vector>
 #include <glm/gtc/constants.hpp>
-#include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include <glad/glad.h>
@@ -9,6 +7,7 @@
 #include "Shader.h"
 #include "core/AssetManager.h"
 #include "environment/World.h"
+#include "rendering/Model.h"
 
 std::unique_ptr<Shader> Debugging::debugShader = nullptr;
 std::shared_ptr<Model> Debugging::debugCone = nullptr;
@@ -16,12 +15,12 @@ World* Debugging::world = nullptr;
 float Debugging::aspectRatio{ 0.0f };
 float Debugging::currentConeAngle{ 0.0f };
 
-void Debugging::cone(float angle, glm::vec3 position, glm::vec3 direction) {
+void Debugging::cone(float angle, float length, glm::vec3 position, glm::vec3 direction) {
 	drawWrapper();
 
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
-	createCone(angle);
+	createCone(angle, length);
 	glm::quat orientation = glm::quatLookAt(glm::normalize(direction), glm::vec3{ 0.0f, 1.0f, 0.0f });
 	glm::mat4 matrix = glm::translate(glm::mat4(1.0f), position) * glm::mat4_cast(orientation);
 	debugShader->setMat4("model", matrix); // Sends object position and orientation to shader
@@ -38,14 +37,13 @@ void Debugging::drawWrapper() {
 	debugShader->setMat4("projection", projection);
 }
 
-void Debugging::createCone(float angle) {
+void Debugging::createCone(float angle, float length) {
 	if (angle == currentConeAngle) {
 		return;
 	}
 	AssetManager::deleteModel("debugCone");
 
 	currentConeAngle = angle;
-	float length = 100.0f;
 	float pi = glm::pi<float>();
 	int segments = 32;
 	float angleStep = pi / (segments / 2.0f);
@@ -69,7 +67,7 @@ void Debugging::createCone(float angle) {
 		indices.push_back(i + 1);
 		indices.push_back(i);
 	}
-	glm::vec4 color = glm::vec4{ 1.0f, 1.0f, 1.0f, 0.15f };
+	glm::vec4 color = glm::vec4{ 1.0f, 1.0f, 1.0f, 0.10f };
 	debugCone = AssetManager::loadModel("debugCone", vertices, indices, color);
 }
 
@@ -79,5 +77,4 @@ void Debugging::Init(World* world, float aspectRatio) {
 	debugShader = std::make_unique<Shader>("shaders/debug.vert", "shaders/debug.frag");
 	debugShader->use();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//createCone(glm::pi<float>() / 4.0f, glm::vec4{1.0f, 1.0f, 1.0f, 0.25f}); // Currently hardcoded so missile FOV changes don't work
 }

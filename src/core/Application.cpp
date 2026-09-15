@@ -69,11 +69,11 @@ void Application::runApp(){
 			appRenderer.draw(world, getAspectRatio());
 		}
 		for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
-			Debugging::cone(missile->getSeeker().gimbalLimit, missile->position, missile->front);
+			Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front);
 			if (!missile->getSeeker().getSeekerOn()) { continue; }
 			glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
 			glm::vec3 worldLookDirection = (missile->rotationQ * missile->getSeeker().seekerOrientation) * forward; // Convert local to world look direction vector
-			Debugging::cone(missile->getSeeker().angleFOV, missile->position, worldLookDirection);
+			Debugging::cone(missile->getSeeker().angleFOV, missile->getSeeker().maxRange, missile->position, worldLookDirection);
 		}
 
 		inputs.keysUpdate();
@@ -95,71 +95,38 @@ void Application::processKeyBindings() {
 
 	if (!world.objects.empty()) {
 		if (inputs.isKeyPressed(GLFW_KEY_W)) {
-			world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 4.0f, 0.0f };
+			world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 0.0f, 1.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_A)) {
-			world.objects[0]->physicsProperties->velocity += glm::vec3{ -4.0f, 0.0f, 0.0f };
+			world.objects[0]->physicsProperties->velocity += glm::vec3{ 1.0f, 0.0f, 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_S)) {
-			world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, -4.0f, 0.0f };
+			world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 0.0f, -1.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_D)) {
-			world.objects[0]->physicsProperties->velocity += glm::vec3{ 4.0f, 0.0f, 0.0f };
+			world.objects[0]->physicsProperties->velocity += glm::vec3{ -1.0f, 0.0f, 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
-			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, 1.0f, 0.0f };
+			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, glm::pi<float>() / 8.0f, 0.0f};
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_LEFT)) {
-			world.objects[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, 1.0f, 0.0f };
-		}
-	}
-	if (!world.missiles.empty()) {
-		if (inputs.isKeyPressed(GLFW_KEY_W)) {
-			world.missiles[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 4.0f, 0.0f };
-		}
-		if (inputs.isKeyPressed(GLFW_KEY_A)) {
-			world.missiles[0]->physicsProperties->velocity += glm::vec3{ -4.0f, 0.0f, 0.0f };
-		}
-		if (inputs.isKeyPressed(GLFW_KEY_S)) {
-			world.missiles[0]->physicsProperties->velocity += glm::vec3{ 0.0f, -4.0f, 0.0f };
-		}
-		if (inputs.isKeyPressed(GLFW_KEY_D)) {
-			world.missiles[0]->physicsProperties->velocity += glm::vec3{ 4.0f, 0.0f, 0.0f };
-		}
-		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
-			world.missiles[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, 1.0f, 0.0f };
-		}
-		if (inputs.isKeyPressed(GLFW_KEY_LEFT)) {
-			world.missiles[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, 1.0f, 0.0f };
+			world.objects[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, glm::pi<float>() / 8.0f, 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_R)) {
 			world.missiles[0]->changeSeekerEnable();
 		}
-		if (inputs.isKeyPressed(GLFW_KEY_L)) {
-			world.missiles[0]->storeReferenceFrame();
+		if (inputs.isKeyPressed(GLFW_KEY_KP_8)) {
+			world.objects[0]->position += glm::vec3{ 0.0f, 1.0f, 0.0f };
 		}
-
-		/*if (inputs.isKeyPressed(GLFW_KEY_SPACE)) {
-			world.missiles[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 5.0f, 0.0f };
+		if (inputs.isKeyPressed(GLFW_KEY_KP_2)) {
+			world.objects[0]->position -= glm::vec3{ 0.0f, 1.0f, 0.0f };
 		}
-		if (inputs.isKeyPressed(GLFW_KEY_W)) {
-			world.missiles[0]->physicsProperties->velocity += world.missiles[0]->front * 2.0f;
+		if (inputs.isKeyPressed(GLFW_KEY_KP_4)) {
+			world.objects[0]->position -= glm::vec3{ 1.0f, 0.0f, 0.0f };
 		}
-		if (inputs.isKeyPressed(GLFW_KEY_A)) {
-			world.missiles[0]->physicsProperties->velocity += world.missiles[0]->left * 2.0f;
+		if (inputs.isKeyPressed(GLFW_KEY_KP_6)) {
+			world.objects[0]->position += glm::vec3{ 1.0f, 0.0f, 0.0f };
 		}
-		if (inputs.isKeyPressed(GLFW_KEY_S)) {
-			world.missiles[0]->physicsProperties->velocity -= world.missiles[0]->front * 2.0f;
-		}
-		if (inputs.isKeyPressed(GLFW_KEY_D)) {
-			world.missiles[0]->physicsProperties->velocity -= world.missiles[0]->left * 2.0f;
-		}
-		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
-			world.missiles[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, 1.0f, 0.0f };
-		}
-		if (inputs.isKeyPressed(GLFW_KEY_LEFT)) {
-			world.missiles[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, 1.0f, 0.0f };
-		}*/
 	}
 
 	if (inputs.isKeyPressed(GLFW_KEY_U)) {
@@ -177,6 +144,14 @@ void Application::processKeyBindings() {
 	if (inputs.isKeyPressed(GLFW_KEY_M)) {
 		world.unloadLevel();
 		world.loadLevel("assets/levels/MissileSim.json");
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_N)) {
+		world.unloadLevel();
+		world.loadLevel("assets/levels/MissileSimSlow.json");
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_B)) {
+		world.unloadLevel();
+		world.loadLevel("assets/levels/MissileSimSlowAlt.json");
 	}
 }
 

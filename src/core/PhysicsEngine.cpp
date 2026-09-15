@@ -1,8 +1,8 @@
+#include <vector>
+
 #include "core/PhysicsEngine.h"
 #include "environment/Object.h"
 #include "environment/PhysicsData.h"
-
-#include <iostream>
 
 const float PhysicsEngine::deltaTime = (1.0f / 60.0f);
 
@@ -100,12 +100,12 @@ std::vector<HitData> PhysicsEngine::earliestCollision(float timeLeft) {
 void PhysicsEngine::positionUpdater(float hitTime) {
 	for (auto& object : physObjects) {
 		if (!object || !object->physicsProperties || object->physicsProperties->mass <= 0.0f || object->physicsProperties->isStatic) continue;
-
+		glm::vec3 worldSpaceVel = object->rotationQ * object->physicsProperties->velocity;
 		if (object->physicsProperties->enableGravity) {
-			object->position += object->physicsProperties->velocity * hitTime + 0.5f * gravity * hitTime * hitTime;
+			object->position += worldSpaceVel * hitTime + 0.5f * gravity * hitTime * hitTime;
 		}
 		else {
-			object->position += object->physicsProperties->velocity * hitTime;
+			object->position += worldSpaceVel * hitTime;
 		}
 
 		glm::vec3 angVel = object->physicsProperties->angularVelocity;

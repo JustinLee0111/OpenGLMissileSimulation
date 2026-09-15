@@ -1,6 +1,9 @@
+#include <memory>
+#include <string>
+#include <utility>
+
 #include "environment/World.h"
 #include "core/AssetManager.h"
-#include "core/InputHandler.h"
 #include "core/LevelManager.h"
 
 Camera* World::currentCamera = nullptr;
@@ -29,20 +32,10 @@ Missile* World::spawnMissile(const std::string& filepath) {
 	ptr->addPhysics();
 	physicsEngine.addPhysObject(ptr);
 
-	missiles.push_back(std::move(obj));
+	objects.push_back(std::move(obj));
+	missiles.push_back(ptr);
 	return ptr;
 }
-
-/*Object* World::spawnObject(std::string name, VertexData& vertexData) {
-	auto obj = std::make_unique<Object>();
-	obj->model = AssetManager::loadModel(name, vertexData.vertices, vertexData.indices, vertexData.color);
-	Object* ptr = obj.get();
-	ptr->addPhysics();
-	physicsEngine.addPhysObject(ptr);
-
-	objects.push_back(std::move(obj));
-	return ptr;
-}*/
 
 void World::loadLevel(const std::string& filepath) {
 	LevelManager::loadLevel(filepath, *this);

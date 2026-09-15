@@ -170,7 +170,6 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <ClCompile Include="src\environment\camera.cpp" />
     <ClCompile Include="src\environment\Light.cpp" />
     <ClCompile Include="src\environment\Object.cpp" />
-    <ClCompile Include="src\environment\PhysicsData.cpp" />
     <ClCompile Include="src\environment\World.cpp" />
     <ClCompile Include="src\glad.c" />
     <ClCompile Include="src\missile\Missile.cpp" />
@@ -196,7 +195,6 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <ClInclude Include="src\environment\World.h" />
     <ClInclude Include="src\missile\Missile.h" />
     <ClInclude Include="src\missile\MissileSeeker.h" />
-    <ClInclude Include="src\missile\MissileTracking.h" />
     <ClInclude Include="src\rendering\Debugging.h" />
     <ClInclude Include="src\primitives\triangle_mesh.h" />
     <ClInclude Include="src\rendering\Mesh.h" />

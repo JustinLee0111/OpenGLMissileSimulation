@@ -1,7 +1,6 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
 #include <memory>
 
 class Model;
@@ -18,9 +17,9 @@ struct VertexData {
 class Debugging {
 	public:
 		void Init(World* world, float aspectRatio);
-		static void cone(float angle, glm::vec3 position, glm::vec3 direction);
+		static void cone(float angle, float length, glm::vec3 position, glm::vec3 direction);
 	private:
-		static void createCone(float angle);
+		static void createCone(float angle, float length);
 		static void drawWrapper();
 		static std::unique_ptr<Shader> debugShader;
 		static std::shared_ptr<Model> debugCone;

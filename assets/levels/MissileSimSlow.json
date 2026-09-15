@@ -3,7 +3,7 @@
   "cameras": [
     {
       "cameraName": "mainCamera",
-      "position": [ 0.0, 2.0, 200.0 ],
+      "position": [ 0.0, 2.0, 50.0 ],
       "yaw": 0.0,
       "pitch" : 0.0
     }
@@ -13,8 +13,8 @@
       "objectName": "missile",
       "modelPath": "assets/models/sphere.obj",
       "gravity": false,
-      "position": [ -100.0, -25.0, 0.0 ],
-      "velocity": [ 0.0, 0.0, 70.0 ],
+      "position": [ -25.0, 0.0, 0.0 ],
+      "velocity": [ 0.0, 0.0, 5.0 ],
       "scale": [ 0.25, 0.25, 1.0 ],
       "collider": "Sphere",
       "restitution": 0.5,
@@ -26,10 +26,10 @@
     {
       "objectName": "target",
       "modelPath": "assets/models/sphere.obj",
-      "velocity": [ -45.0, 35.0, 5.0 ],
+      "velocity": [ -3.0, 2.0, 0.0 ],
       "gravity": false,
       "isStatic" : false,
-      "position": [ 100.0, -25.0, 0.0 ],
+      "position": [ 25.0, 0.0, 0.0 ],
       "collider": "Sphere",
       "restitution": 0.5
     }

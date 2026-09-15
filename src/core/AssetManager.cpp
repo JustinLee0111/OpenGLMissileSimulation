@@ -1,3 +1,6 @@
+#include <memory>
+#include <vector>
+
 #include "core/AssetManager.h"
 
 std::unordered_map<std::string, std::weak_ptr<Model>> AssetManager::modelCache;

@@ -1,9 +1,8 @@
 #pragma once
 
 #include "missile/MissileSeeker.h"
-#include "missile/MissileTracking.h"
+#include "environment/Object.h"
 
-class Object;
 class World;
 
 class Missile : public Object {
@@ -20,10 +19,15 @@ class Missile : public Object {
 			seeker.seekerEnabled = !seeker.seekerEnabled;
 		}
 
-		void storeReferenceFrame() {
-			seeker.storeReferenceFrame();
+		glm::vec3 getFlightPathRate() { // Gets how much to rotate by to get on proper flight path angle for collision
+			return proNavGain * seeker.getLOSrate();
 		}
+
+		void proNav(float deltaTime); // Uses proportional navigation to correct flight path for collision
+
 	private:
 		MissileSeeker seeker;
-		MissileTracking tracking;
+		//MissileTracking tracking;
+		float proNavGain = 3.5f; // Gain for how aggressive the missile gets on optimal flight path, higher = more aggressive
+		float maxAngVel = glm::pi<float>() / 5.0f; // Radians per second
 };

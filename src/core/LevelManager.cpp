@@ -6,7 +6,6 @@
 #include "environment/camera.h"
 #include "environment/Object.h"
 #include "environment/PhysicsData.h"
-#include "missile/Missile.h"
 
 // Dynamic level loading using JSON level data
 void LevelManager::loadLevel(const std::string& filepath, World& world) {
@@ -50,6 +49,9 @@ void LevelManager::loadLevel(const std::string& filepath, World& world) {
 		}
 		if (object.contains("scale")) {
 			spawnedObject->scale = glm::vec3{ object["scale"][0], object["scale"][1], object["scale"][2] };
+		}
+		if (object.contains("velocity")) {
+			spawnedObject->physicsProperties->velocity = glm::vec3{ object["velocity"][0], object["velocity"][1], object["velocity"][2] };
 		}
 		auto position = object["position"];
 		spawnedObject->position = glm::vec3{ position[0].get<float>(), position[1].get<float>(), position[2].get<float>() };
