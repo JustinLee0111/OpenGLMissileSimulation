@@ -1,3 +1,4 @@
+![description](assets/images/demo.png)
 
 <h2  style="margin-bottom: 0px;">OpenGL Missile Simulation</h2>
 
