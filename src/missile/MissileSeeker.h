@@ -5,6 +5,9 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+class World;
+class Missile;
+
 // Infrared Counter Counter Measure
 enum class IRCCMType {
 	MEMORY,
@@ -18,22 +21,6 @@ enum class SeekerState {
 	Off // Seeker scanning off but can still transmit data, useful for IRCCM
 };
 
-struct SeekerData {
-	bool tracking = false;
-
-	glm::quat rotateToTarget{ 1.0f, 0.0f, 0.0f, 0.0f }; // How much to rotate current seeker quaternion by to point towards target
-
-	float targetTemperature{ 0.0f };
-
-	glm::vec3 oldLOStoTarget{ 0.0f };
-	glm::vec3 LOStoTarget{ 0.0f };
-
-	glm::vec3 losRate{ 0.0f }; // Line of Sight Rate, if this zero or near zero, it means current flight path is optimal for collision
-};
-
-class World;
-class Missile;
-
 class MissileSeeker {
 public:
 	SeekerState curState = SeekerState::Scanning;
@@ -43,7 +30,7 @@ public:
 	glm::vec3 seekerAngVel{ 0.0f };
 
 	const float maxSlewRate{ glm::radians(100.0f) }; // Radians per second
-	const float gimbalLimit{ glm::pi<float>() / 2.0f}; // In radians, total gimbal range. NOT FROM MISSILE BORESIGHT
+	const float gimbalLimit{ glm::pi<float>() / 1.1f}; // In radians, total gimbal range. NOT FROM MISSILE BORESIGHT
 	const float maxRange{ 500.0f };
 	const float recenterDelay{ 0.0f };
 
@@ -76,5 +63,18 @@ public:
 
 	bool seekerEnabled = true;
 private:
+	struct SeekerData {
+		bool tracking = false;
+
+		glm::quat rotateToTarget{ 1.0f, 0.0f, 0.0f, 0.0f }; // How much to rotate current seeker quaternion by to point towards target
+
+		float targetTemperature{ 0.0f };
+
+		glm::vec3 oldLOStoTarget{ 0.0f };
+		glm::vec3 LOStoTarget{ 0.0f };
+
+		glm::vec3 losRate{ 0.0f }; // Line of Sight Rate, if this zero or near zero, it means current flight path is optimal for collision
+	};
+
 	SeekerData curSeekerData;
 };

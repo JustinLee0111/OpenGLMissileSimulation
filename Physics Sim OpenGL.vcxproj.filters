@@ -75,6 +75,9 @@
     <ClCompile Include="src\missile\Missile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\environment\ParticleSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dependencies\include\glad\glad.h">
@@ -137,6 +140,12 @@
     <ClInclude Include="src\missile\Missile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\environment\ParticleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\environment\ParticleData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragment.frag">
@@ -147,5 +156,7 @@
     </None>
     <None Include="shaders\debug.frag" />
     <None Include="shaders\debug.vert" />
+    <None Include="shaders\particles.frag" />
+    <None Include="shaders\particles.vert" />
   </ItemGroup>
 </Project>

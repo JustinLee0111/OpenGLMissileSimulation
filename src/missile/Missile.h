@@ -25,9 +25,14 @@ class Missile : public Object {
 
 		void proNav(float deltaTime); // Uses proportional navigation to correct flight path for collision
 
+		bool engineOn = false;
+
 	private:
 		MissileSeeker seeker;
 		//MissileTracking tracking;
 		float proNavGain = 3.5f; // Gain for how aggressive the missile gets on optimal flight path, higher = more aggressive
-		float maxAngVel = glm::pi<float>() / 5.0f; // Radians per second
+		float maxAngVel = glm::pi<float>() / 4.0f; // Radians per second
+		float engineBurnTime = 3.0f; // Burn time in seconds
+		float burnTimeRemaining = engineBurnTime;
+		glm::vec3 engineThrust{0.0f, 0.0f, 15.0f}; // Thrust in newtons
 };

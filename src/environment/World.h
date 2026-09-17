@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 
+#include "environment/ParticleSystem.h"
 #include "core/PhysicsEngine.h"
 #include "environment/camera.h"
 #include "environment/Light.h"
@@ -27,6 +28,8 @@ public:
 	std::vector<std::unique_ptr<Camera>> cameras;
 	std::vector<std::unique_ptr<Light>> lights;
 	std::vector<Missile*> missiles;
+	std::unique_ptr<ParticleSystem> missileSmoke = nullptr;
+
 	static Camera* currentCamera;
 
 	World() = default;
@@ -59,6 +62,8 @@ public:
 	void unloadLevel();
 
 	void update();
+
+	void updateParticles(float deltaTime);
 
 	float getPhysicsRate() const{
 		return physicsEngine.getPhysicsRate();

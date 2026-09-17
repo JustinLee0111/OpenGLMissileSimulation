@@ -11,6 +11,7 @@ Camera* World::currentCamera = nullptr;
 void World::worldInit() {
 	setAmbientLightColor(glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
 	createLight(glm::vec3{ 2.0f, 3.0f, 2.0f }, glm::vec4{0.5f, 0.5f, 0.5f, 0.5f});
+	missileSmoke = std::make_unique<ParticleSystem>();
 }
 
 // Creates an object and constructs it based on inputted parameters

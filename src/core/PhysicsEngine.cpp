@@ -126,7 +126,7 @@ void PhysicsEngine::forcesUpdater(float timeLeft) {
 	if (timeLeft <= 0.0f) return;
 	for (auto& object : physObjects) {
 		if (!object || !object->physicsProperties || object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f || object->physicsProperties->isStatic) continue;
-		glm::vec3 acceleration = object->physicsProperties->totalForces / object->physicsProperties->mass;
+		glm::vec3 acceleration = object->rotationQ * (object->physicsProperties->totalForces / object->physicsProperties->mass);
 		if (object->physicsProperties->enableGravity) {
 			acceleration += gravity;
 		}		

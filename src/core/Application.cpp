@@ -28,14 +28,14 @@ int Application::appInit() {
 	glfwSetKeyCallback(mainWindow, key_callback); // Where to send key stroke information once detected
 	glfwSetFramebufferSizeCallback(mainWindow, window_resize); // Where to send window information once resize detected
 
-	glClearColor(0.25f, 0.5f, 0.75f, 1.0f);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	inputs.init(mainWindow);
 
 	world.loadLevel("assets/levels/MissileSim.json"); // Load default level
-	
+	ParticleSystem::init();
 	world.worldInit();
 
 	return 0;
@@ -62,11 +62,13 @@ void Application::runApp(){
 		while (accumulator >= fixedDeltaTime) {
 			if (!world.objects.empty()) {
 				world.update();
+				world.missileSmoke->updateParticles(frameTime);
 			}
 			accumulator -= fixedDeltaTime;
 		}
 		if (world.currentCamera) {
 			appRenderer.draw(world, getAspectRatio());
+			world.missileSmoke->draw(world, getAspectRatio()); // Temporarily drawing each particle system manually, will make vector
 		}
 		for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
 			Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front);
@@ -75,7 +77,6 @@ void Application::runApp(){
 			glm::vec3 worldLookDirection = (missile->rotationQ * missile->getSeeker().seekerOrientation) * forward; // Convert local to world look direction vector
 			Debugging::cone(missile->getSeeker().angleFOV, missile->getSeeker().maxRange, missile->position, worldLookDirection);
 		}
-
 		inputs.keysUpdate();
 
 		glfwSwapBuffers(mainWindow);
@@ -112,9 +113,6 @@ void Application::processKeyBindings() {
 		if (inputs.isKeyPressed(GLFW_KEY_LEFT)) {
 			world.objects[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, glm::pi<float>() / 8.0f, 0.0f };
 		}
-		if (inputs.isKeyPressed(GLFW_KEY_R)) {
-			world.missiles[0]->changeSeekerEnable();
-		}
 		if (inputs.isKeyPressed(GLFW_KEY_KP_8)) {
 			world.objects[0]->position += glm::vec3{ 0.0f, 1.0f, 0.0f };
 		}
@@ -127,6 +125,14 @@ void Application::processKeyBindings() {
 		if (inputs.isKeyPressed(GLFW_KEY_KP_6)) {
 			world.objects[0]->position += glm::vec3{ 1.0f, 0.0f, 0.0f };
 		}
+		if (!world.missiles.empty()) {
+			if (inputs.isKeyPressed(GLFW_KEY_R)) {
+				world.missiles[0]->changeSeekerEnable();
+			}
+			if (inputs.isKeyPressed(GLFW_KEY_SPACE)) {
+				world.missiles[0]->engineOn = true;
+			}
+		}	
 	}
 
 	if (inputs.isKeyPressed(GLFW_KEY_U)) {
@@ -152,6 +158,10 @@ void Application::processKeyBindings() {
 	if (inputs.isKeyPressed(GLFW_KEY_B)) {
 		world.unloadLevel();
 		world.loadLevel("assets/levels/MissileSimSlowAlt.json");
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_V)) {
+		world.unloadLevel();
+		world.loadLevel("assets/levels/MissileSimStill.json");
 	}
 }
 

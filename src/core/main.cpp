@@ -1,3 +1,5 @@
+#define GLFW_INCLUDE_NONE
+
 #include "core/Application.h"
 
 // Description: Working basic missile simulation combined with a custom physics simulator for bouncing sphere on sphere and sphere on bounded plane. Uses Continuous Collision Detection (CCD) to detect collisions.
@@ -7,7 +9,7 @@
 // Analyical solving is much faster but not as reliable and flexible as Conservative Advancement.
 // 
 // <-- FEATURES -->
-// - Proportional navigation guided missile
+// - Proportional navigation guided missile with an engine
 // - Continuous Collision Detection solver with both conservative advancement and analytical solver.
 // - Bounded plane collisions with dynamic normals for edge collisions (only for sphere and plane collisions).
 // - Sphere on sphere collisions using impulses
@@ -24,11 +26,13 @@
 // Left Arrow - Rotate counter-clockwise
 // Right Arrow - Rotate clockwise
 // R - Disable/Enable Missile Seeker
+// Space - Enable missile's engine
 // 
 // U - Unload level
-// M - Load missile level
+// M - Load fast missile level
 // N - Load slower missile level
 // B - Load alternate slower missile level
+// V - Load level with a still missile
 // L - Load level
 // T - Load level with moving plane
 
