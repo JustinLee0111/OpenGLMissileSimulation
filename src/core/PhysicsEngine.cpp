@@ -100,7 +100,8 @@ std::vector<HitData> PhysicsEngine::earliestCollision(float timeLeft) {
 void PhysicsEngine::positionUpdater(float hitTime) {
 	for (auto& object : physObjects) {
 		if (!object || !object->physicsProperties || object->physicsProperties->mass <= 0.0f || object->physicsProperties->isStatic) continue;
-		glm::vec3 worldSpaceVel = object->rotationQ * object->physicsProperties->velocity;
+		//glm::vec3 worldSpaceVel = object->rotationQ * object->physicsProperties->velocity;
+		glm::vec3 worldSpaceVel = object->physicsProperties->velocity;
 		if (object->physicsProperties->enableGravity) {
 			object->position += worldSpaceVel * hitTime + 0.5f * gravity * hitTime * hitTime;
 		}
@@ -126,7 +127,7 @@ void PhysicsEngine::forcesUpdater(float timeLeft) {
 	if (timeLeft <= 0.0f) return;
 	for (auto& object : physObjects) {
 		if (!object || !object->physicsProperties || object->physicsProperties->isKinematic || object->physicsProperties->mass <= 0.0f || object->physicsProperties->isStatic) continue;
-		glm::vec3 acceleration = object->rotationQ * (object->physicsProperties->totalForces / object->physicsProperties->mass);
+		glm::vec3 acceleration = (object->physicsProperties->totalForces / object->physicsProperties->mass);
 		if (object->physicsProperties->enableGravity) {
 			acceleration += gravity;
 		}		

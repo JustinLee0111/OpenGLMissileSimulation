@@ -95,17 +95,18 @@ void Application::processKeyBindings() {
 	}
 
 	if (!world.objects.empty()) {
+		glm::quat r = world.objects[0]->rotationQ;
 		if (inputs.isKeyPressed(GLFW_KEY_W)) {
-			world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 0.0f, 1.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, 2.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_A)) {
-			world.objects[0]->physicsProperties->velocity += glm::vec3{ 1.0f, 0.0f, 0.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 2.0f, 0.0f, 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_S)) {
-			world.objects[0]->physicsProperties->velocity += glm::vec3{ 0.0f, 0.0f, -1.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, -2.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_D)) {
-			world.objects[0]->physicsProperties->velocity += glm::vec3{ -1.0f, 0.0f, 0.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ -2.0f, 0.0f, 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
 			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, glm::pi<float>() / 8.0f, 0.0f};

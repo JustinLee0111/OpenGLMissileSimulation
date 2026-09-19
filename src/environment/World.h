@@ -30,6 +30,8 @@ public:
 	std::vector<Missile*> missiles;
 	std::unique_ptr<ParticleSystem> missileSmoke = nullptr;
 
+	float airDensity = 1.0f; // kg/m^3
+
 	static Camera* currentCamera;
 
 	World() = default;
