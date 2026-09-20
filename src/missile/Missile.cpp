@@ -18,30 +18,50 @@ void Missile::update(const World& world, float deltaTime) {
 		engineOn = false;
 		world.missileSmoke->stopEmit();
 	}
-
-	if (seeker.curState == SeekerState::Off) { // If seeker is off, don't continue it's trajectory and go straight
+	if (seeker.curState == SeekerState::Scanning) {
+		physicsProperties->angularVelocity = glm::vec3{ 0.0f };
+	}
+	else if (seeker.curState == SeekerState::Off) { // If seeker is off, don't continue it's trajectory and go straight
 		seeker.resetSeekerData();
 		physicsProperties->angularVelocity = glm::vec3{ 0.0f };
 	}
 	std::cout << "Forward Vel: " << (glm::conjugate(rotationQ) * physicsProperties->velocity).z << std::endl; // Prints the forward velocity of the missile for debugging
+	if (seeker.curState == SeekerState::Scanning) {
+	}
+	
 }
 
 void Missile::proNav(float deltaTime) { // Orients the missile using calculated proportional navigation to intercept the target
 	if (seeker.curState == SeekerState::Tracking) {
 		glm::vec3 flightPathRate{ getFlightPathRate() };
 		float flightPathMag = glm::length(flightPathRate);
+		
+		glm::vec3 finalAngularVelocity{ 0.0f };
+
 		if (flightPathMag >= 0.00001f) {
 			float vel = glm::length(physicsProperties->velocity);
-			float speedTurnCap = std::clamp( vel * vel / speedMaxTurn, 0.0f, 1.0f); // Makes the turn rate speed dependent, at the specified speed, the turn rate is at its peak
+
+			// Makes the turn rate speed dependent, at the specified speed, the turn rate is at its peak
+			// Minimum is 0.5 to mimic thrust vectoring at lower speeds
+			float speedTurnCap = std::clamp( vel * vel / speedMaxTurn, 0.5f, 1.0f);
+
 			if (flightPathMag > maxAngVel) {
-				physicsProperties->angularVelocity = flightPathRate * ( (maxAngVel * speedTurnCap)  / flightPathMag);
+				finalAngularVelocity = flightPathRate * ( (maxAngVel * speedTurnCap)  / flightPathMag);
 			}
 			else {
-				physicsProperties->angularVelocity = flightPathRate * speedTurnCap;
+				finalAngularVelocity = flightPathRate * speedTurnCap;
 			}
 		}
+		// Makes sure the seeker is always tracking even with sharp turns
+		glm::quat missileRotate = glm::angleAxis(glm::length(finalAngularVelocity * deltaTime), glm::normalize(finalAngularVelocity * deltaTime));
+		glm::vec3 projectedSeekerLook = (rotationQ * ( glm::conjugate(missileRotate) * seeker.seekerOrientation ) ) * glm::vec3{ 0.0f, 0.0f, 1.0f };
+		float projectedSeekerAngle = glm::acos(glm::clamp(glm::dot(projectedSeekerLook, front), -1.0f, 1.0f));
+
+		if (projectedSeekerAngle >= seeker.gimbalLimit / 2.0f) {
+			physicsProperties->angularVelocity = glm::vec3{ 0.0f }; // Don't make missile turn if seeker will lose visual on target
+		}
 		else {
-			physicsProperties->angularVelocity = glm::vec3{ 0.0f };
+			physicsProperties->angularVelocity = finalAngularVelocity;
 		}
 	}
 }
@@ -63,7 +83,7 @@ void Missile::updateAeroForce(float airDensity) {
 	float division = (airDensity * glm::dot(physicsProperties->velocity, physicsProperties->velocity)) / 2.0f;
 
 	float liftCoeff = angleOfAttack;
-	float dragCoeff = angleOfAttack + 0.02f;
+	float dragCoeff = angleOfAttack + 0.005f; // AOA plus parasitic drag
 
 	glm::vec3 rotateAxis{ left };
 	glm::vec3 liftDir{ 0.0f };

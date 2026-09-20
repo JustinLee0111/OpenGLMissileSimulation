@@ -34,12 +34,11 @@ public:
 	const float maxRange{ 500.0f };
 	const float recenterDelay{ 0.0f };
 
-	float angleFOV{ glm::pi<float>() / 45.0f }; // Degrees
-
 	void update(const World& world, Missile& missile, float deltaTime);
 	void updateSeekerState();
 	void clampGimbal(Missile& missile); // Clamps how much the fov can rotate based on gimbal limit
 	void scan(const World& world, Missile& missile, float deltaTime); // Scans seeker FOV for any targets, need to create targeting priority for multiple targets
+	void updateSeekerAngle(Missile& missile);
 
 	const glm::vec3 getLOSrate() const{
 		return curSeekerData.losRate;
@@ -57,6 +56,14 @@ public:
 		curSeekerData.rotateToTarget = glm::quat{ 1.0f, 0.0f, 0.0f, 0.0f };
 	}
 
+	const float getSeekerAngle() const {
+		return seekerAngle;
+	}
+
+	const float getSeekerFOV() const {
+		return angleFOV;
+	}
+
 	const bool getSeekerOn() const {
 		return seekerEnabled;
 	}
@@ -70,11 +77,16 @@ private:
 
 		float targetTemperature{ 0.0f };
 
+		float seekerAngleToTarget{ 0.0f };
+
 		glm::vec3 oldLOStoTarget{ 0.0f };
 		glm::vec3 LOStoTarget{ 0.0f };
 
 		glm::vec3 losRate{ 0.0f }; // Line of Sight Rate, if this zero or near zero, it means current flight path is optimal for collision
 	};
+
+	float angleFOV{ glm::pi<float>() / 45.0f }; // Degrees
+	float seekerAngle{ 0.0f };
 
 	SeekerData curSeekerData;
 };

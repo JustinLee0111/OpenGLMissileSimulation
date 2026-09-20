@@ -13,7 +13,6 @@ void MissileSeeker::update(const World& world, Missile& missile, float deltaTime
 		
 		if (curState == SeekerState::Tracking) {
 			seekerOrientation = glm::normalize(curSeekerData.rotateToTarget * seekerOrientation); // Updates the rotation for seeker to point towards target
-			clampGimbal(missile);
 			//std::cout << "LOS Rate: " << glm::length( curSeekerData.losRate ) << std::endl;
 		}
 	}
@@ -21,6 +20,8 @@ void MissileSeeker::update(const World& world, Missile& missile, float deltaTime
 		updateSeekerState();
 		resetSeekerRot();
 	}
+	updateSeekerAngle(missile);
+	clampGimbal(missile);
 }
 
 void MissileSeeker::updateSeekerState() {
@@ -100,4 +101,10 @@ void MissileSeeker::scan(const World& world, Missile& missile, float deltaTime){
 		}
 	}
 	curSeekerData.tracking = false;
+}
+
+void MissileSeeker::updateSeekerAngle(Missile& missile) {
+	glm::vec3 seekerFront = (missile.rotationQ * seekerOrientation) * glm::vec3{ 0.0f, 0.0f, 1.0f };
+	float angle = glm::acos(glm::clamp(glm::dot(missile.front, seekerFront), -1.0f, 1.0f));
+	seekerAngle = angle;
 }

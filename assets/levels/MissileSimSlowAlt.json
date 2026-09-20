@@ -26,7 +26,7 @@
     {
       "objectName": "target",
       "modelPath": "assets/models/sphere.obj",
-      "velocity": [ -3.0, 1.0, 3.0 ],
+      "velocity": [ 20.0, 1.0, 3.0 ],
       "gravity": false,
       "isStatic" : false,
       "position": [ 50.0, 0.0, 0.0 ],

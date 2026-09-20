@@ -75,7 +75,7 @@ void Application::runApp(){
 			if (!missile->getSeeker().getSeekerOn()) { continue; }
 			glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
 			glm::vec3 worldLookDirection = (missile->rotationQ * missile->getSeeker().seekerOrientation) * forward; // Convert local to world look direction vector
-			Debugging::cone(missile->getSeeker().angleFOV, missile->getSeeker().maxRange, missile->position, worldLookDirection);
+			Debugging::cone(missile->getSeeker().getSeekerFOV(), missile->getSeeker().maxRange, missile->position, worldLookDirection);
 		}
 		inputs.keysUpdate();
 

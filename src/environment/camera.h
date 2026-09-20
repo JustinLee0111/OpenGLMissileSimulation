@@ -13,7 +13,7 @@ class Camera {
 		glm::quat rotation{ 1.0f, 0.0f, 0.0f, 0.0f };
 		float cameraFOV = 45.0f;
 		float closePlane = 0.1f;
-		float farPlane = 1000.0f;
+		float farPlane = 10000.0f;
 
 		Camera() = default;
 		Camera(glm::vec3 cameraPosition = glm::vec3{ 0.0f, 0.0f, 0.0f }) : cameraPos(cameraPosition) {};
