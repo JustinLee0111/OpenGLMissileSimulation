@@ -1,4 +1,5 @@
 #include <vector>
+#include <iostream>
 
 #include "core/PhysicsEngine.h"
 #include "environment/Object.h"
@@ -65,8 +66,9 @@ std::vector<HitData> PhysicsEngine::earliestCollision(float timeLeft) {
 	if (timeLeft <= 0.0f) return collisions;
 
 	for (int i = 0; i < physObjects.size(); ++i) {
+		if (!physObjects[i] || !physObjects[i]->physicsProperties || physObjects.size() == 1) continue;
 		for (int j = i + 1; j < physObjects.size(); ++j) {
-			if (!physObjects[i] || !physObjects[j] || !physObjects[i]->physicsProperties || !physObjects[j]->physicsProperties) continue;
+			if (!physObjects[j] || !physObjects[j]->physicsProperties) continue;
 			HitData hitData;
 			if (physObjects[i]->physicsProperties->collider == ColliderType::Sphere) {
 				if (physObjects[j]->physicsProperties->collider == ColliderType::Sphere) {

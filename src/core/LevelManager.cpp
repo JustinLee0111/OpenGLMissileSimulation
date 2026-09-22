@@ -16,21 +16,15 @@ void LevelManager::loadLevel(const std::string& filepath, World& world) {
 
 	nlohmann::json levelData;
 	file >> levelData;
-	for (auto camera : levelData["cameras"]) {
-		Camera* tempCamera = world.createCamera();
-		auto position = camera["position"];
-		float yaw = camera["yaw"];
-		float pitch = camera["pitch"];
-		tempCamera->cameraPos = glm::vec3{ position[0].get<float>(), position[1].get<float>(), position[2].get<float>() };;
-		tempCamera->cameraRotate(yaw, pitch);
-	}
 	for (auto object : levelData["objects"]) {
 		Object* spawnedObject;
 		if (object["objectName"] == "missile") {
 			spawnedObject = world.spawnMissile(object["modelPath"]);
+			spawnedObject->objName = object["objectName"];
 		}
 		else {
 			spawnedObject = world.spawnObject(object["modelPath"]);
+			spawnedObject->objName = object["objectName"];
 		}		
 		if (object.contains("gravity")) {
 			spawnedObject->physicsProperties->enableGravity = object["gravity"];
@@ -70,6 +64,17 @@ void LevelManager::loadLevel(const std::string& filepath, World& world) {
 		}
 		else if (tempCollider == "Plane") {
 			spawnedObject->physicsProperties->collider = ColliderType::Plane;
+		}
+	}
+	for (auto camera : levelData["cameras"]) {
+		Camera* tempCamera = world.createCamera();
+		auto position = camera["position"];
+		float yaw = camera["yaw"];
+		float pitch = camera["pitch"];
+		tempCamera->cameraPos = glm::vec3{ position[0].get<float>(), position[1].get<float>(), position[2].get<float>() };
+		tempCamera->cameraRotate(yaw, pitch);
+		if (camera.contains("chase")) {
+			tempCamera->chase = camera["chase"];
 		}
 	}
 }

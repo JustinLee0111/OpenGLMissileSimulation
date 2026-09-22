@@ -72,7 +72,7 @@ void MissileSeeker::scan(const World& world, Missile& missile, float deltaTime){
 		float radiusAtDistance = glm::tan(theta) * normalDistance; // Gets the radius of cone at the distance the object is at along cone
 
 		// If object is within seeker FOV, start tracking
-		if (distanceFovCenterToObj < radiusAtDistance + obj->physicsProperties->radius) { 
+		if (distanceFovCenterToObj < radiusAtDistance + obj->physicsProperties->radius && obj->temperature >= tempThreshold) { 
 			curSeekerData.tracking = true;
 
 			curSeekerData.oldLOStoTarget = (glm::length(curSeekerData.LOStoTarget) != 0.0f) ? curSeekerData.LOStoTarget : glm::vec3{ 0.0f }; // Sets the old LOS
@@ -107,4 +107,33 @@ void MissileSeeker::updateSeekerAngle(Missile& missile) {
 	glm::vec3 seekerFront = (missile.rotationQ * seekerOrientation) * glm::vec3{ 0.0f, 0.0f, 1.0f };
 	float angle = glm::acos(glm::clamp(glm::dot(missile.front, seekerFront), -1.0f, 1.0f));
 	seekerAngle = angle;
+}
+
+void MissileSeeker::findRandomTarget(World& world, Missile& missile){
+	glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
+	glm::vec3 missileFront = missile.rotationQ * forward;
+
+	for (auto& obj : world.objects) {
+		if (obj->physicsProperties->collider != ColliderType::Sphere || obj.get() == &missile) continue; // Only tracking spheres
+
+		glm::vec3 missileToObj = obj->position - missile.position;
+		float normalDistance = glm::dot(missileToObj, missileFront);
+
+		if (normalDistance - obj->physicsProperties->radius >= maxRange || normalDistance <= -obj->physicsProperties->radius) continue; // If object out of seeker max range, object is skipped
+
+		glm::vec3 fovCenterToObj = missileToObj - normalDistance * missileFront; // Center of cone to the object
+		float distanceFovCenterToObj = glm::length(fovCenterToObj);
+
+		float theta = gimbalLimit / 2.0f; // Gets angle of half of cone to find radius at specific distance using trig
+		float radiusAtDistance = glm::tan(theta) * normalDistance; // Gets the radius of cone at the distance the object is at along cone
+
+		// If object is within seeker FOV, start tracking
+		if (distanceFovCenterToObj < radiusAtDistance + obj->physicsProperties->radius && obj->temperature >= tempThreshold) {
+			// SEEKER ROTATION CALCULATIONS
+			missileToObj = glm::conjugate(missile.rotationQ) * glm::normalize(missileToObj); // Converts the target's coordinates to the missile's local space then the seeker's local space
+			seekerOrientation = glm::rotation(forward, missileToObj);
+			curSeekerData.tracking = true;
+			return;
+		}
+	}
 }

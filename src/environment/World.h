@@ -4,7 +4,8 @@
 #include <memory>
 #include <string>
 
-#include "environment/ParticleSystem.h"
+#include "environment/ParticleBucket.h"
+#include "core/ParticleSystem.h"
 #include "core/PhysicsEngine.h"
 #include "environment/camera.h"
 #include "environment/Light.h"
@@ -21,6 +22,7 @@ struct environmentLightingSettings {
 class World {
 private:
 	PhysicsEngine physicsEngine;
+	ParticleSystem particleSystem;
 	environmentLightingSettings worldLightSettings; // Stores ambient lighting data currently
 public:
 	// All objects and cameras stored here
@@ -28,7 +30,7 @@ public:
 	std::vector<std::unique_ptr<Camera>> cameras;
 	std::vector<std::unique_ptr<Light>> lights;
 	std::vector<Missile*> missiles;
-	std::unique_ptr<ParticleSystem> missileSmoke = nullptr;
+	std::vector<std::unique_ptr<ParticleBucket>> particleBuckets;
 
 	float airDensity = 1.0f; // kg/m^3
 
@@ -67,7 +69,13 @@ public:
 
 	void updateParticles(float deltaTime);
 
+	const ParticleSystem& getParticleSystem() const{
+		return particleSystem;
+	}
+
 	float getPhysicsRate() const{
 		return physicsEngine.getPhysicsRate();
 	}
+
+	void deleteObj(std::string deleteName);
 };

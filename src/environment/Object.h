@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <memory>
+#include <string>
 
 #include "environment/PhysicsData.h"
 
@@ -10,6 +11,8 @@ class Model;
 
 class Object {
 public:
+	std::string objName{};
+
 	glm::vec3 position{ 0.0f };
 	glm::quat rotationQ{ 1.0f, 0.0f, 0.0f, 0.0f };
 	glm::vec3 scale{ 1.0f };
@@ -21,6 +24,9 @@ public:
 
 	std::unique_ptr<PhysicsData> physicsProperties;
 	std::shared_ptr<Model> model;
+
+	float temperature{ 400.0f };
+	float health{ 100.0f };
 
 	Object() = default;
 	~Object() = default;
@@ -42,6 +48,10 @@ public:
 	void addChild(Object* child) {
 		children.push_back(child);
 		child->parent = this;
+	}
+
+	void takeDamage(float damage) {
+		health -= damage;
 	}
 
 	private:

@@ -2,13 +2,14 @@
 #include <glad/glad.h>
 
 #include "core/Application.h"
+#include "missile/MissileSeeker.h"
 
 int Application::appInit() {
 	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW" << std::endl;
 		return -1;
 	}
-
+	
 	mainWindow = glfwCreateWindow(getWidth(), getHeight(), "Physics Sim", nullptr, nullptr);
 	glfwMakeContextCurrent(Application::mainWindow);
 
@@ -32,10 +33,8 @@ int Application::appInit() {
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	inputs.init(mainWindow);
+	inputs.init(mainWindow); 
 
-	world.loadLevel("assets/levels/MissileSim.json"); // Load default level
-	ParticleSystem::init();
 	world.worldInit();
 
 	return 0;
@@ -57,28 +56,30 @@ void Application::runApp(){
 		// Extreme low fps frametime clamp
 		if (frameTime > 0.25f) frameTime = 0.25f;
 		accumulator += frameTime;
-
 		// Ensures physics simulation does fixed time steps regardless of fps
 		while (accumulator >= fixedDeltaTime) {
-			if (!world.objects.empty()) {
-				world.update();
-				world.missileSmoke->updateParticles(frameTime);
-			}
+			world.update();
 			accumulator -= fixedDeltaTime;
+		}
+		for (auto& camera : world.cameras) {
+			if (camera->chaseObject) {
+				camera->cameraPos = camera->chaseObject->position + glm::vec3{ -25.0f, 5.0f, 0.0f };
+			}
 		}
 		if (world.currentCamera) {
 			appRenderer.draw(world, getAspectRatio());
-			world.missileSmoke->draw(world, getAspectRatio()); // Temporarily drawing each particle system manually, will make vector
+			//if(!world.objects.empty()){}
+			world.getParticleSystem().draw(world, getAspectRatio());
 		}
 		for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
-			Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front);
+			Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front); // Gimbal limit visual
 			if (!missile->getSeeker().getSeekerOn()) { continue; }
 			glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
 			glm::vec3 worldLookDirection = (missile->rotationQ * missile->getSeeker().seekerOrientation) * forward; // Convert local to world look direction vector
-			Debugging::cone(missile->getSeeker().getSeekerFOV(), missile->getSeeker().maxRange, missile->position, worldLookDirection);
+			Debugging::cone(missile->getSeeker().getSeekerFOV(), missile->getSeeker().maxRange, missile->position, worldLookDirection); // Seeker FOV visual
 		}
-		inputs.keysUpdate();
 
+		inputs.keysUpdate();
 		glfwSwapBuffers(mainWindow);
 	}
 }
@@ -97,10 +98,10 @@ void Application::processKeyBindings() {
 	if (!world.objects.empty()) {
 		glm::quat r = world.objects[0]->rotationQ;
 		if (inputs.isKeyPressed(GLFW_KEY_W)) {
-			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, 2.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, 5.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_A)) {
-			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 2.0f, 0.0f, 0.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 5.0f, 0.0f, 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_S)) {
 			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, -2.0f };
@@ -109,10 +110,10 @@ void Application::processKeyBindings() {
 			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ -2.0f, 0.0f, 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
-			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, glm::pi<float>() / 8.0f, 0.0f};
+			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, glm::pi<float>(), 0.0f};
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_LEFT)) {
-			world.objects[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, glm::pi<float>() / 8.0f, 0.0f };
+			world.objects[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, glm::pi<float>(), 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_KP_8)) {
 			world.objects[0]->position += glm::vec3{ 0.0f, 1.0f, 0.0f };
@@ -133,7 +134,16 @@ void Application::processKeyBindings() {
 			if (inputs.isKeyPressed(GLFW_KEY_SPACE)) {
 				world.missiles[0]->engineOn = true;
 			}
-		}	
+			if (inputs.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
+				world.missiles[0]->findRandomTarget(world);
+			}
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_1)) {
+			world.currentCamera = world.cameras[0].get();
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_2)) {
+			world.currentCamera = world.cameras[1].get();
+		}
 	}
 
 	if (inputs.isKeyPressed(GLFW_KEY_U)) {

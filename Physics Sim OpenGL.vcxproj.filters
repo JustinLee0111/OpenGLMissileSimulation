@@ -75,7 +75,10 @@
     <ClCompile Include="src\missile\Missile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\environment\ParticleSystem.cpp">
+    <ClCompile Include="src\core\ParticleSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\environment\ParticleBucket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -140,10 +143,13 @@
     <ClInclude Include="src\missile\Missile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\environment\ParticleSystem.h">
+    <ClInclude Include="src\environment\ParticleData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\environment\ParticleData.h">
+    <ClInclude Include="src\core\ParticleSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\environment\ParticleBucket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

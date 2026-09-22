@@ -170,7 +170,8 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <ClCompile Include="src\core\InputHandler.cpp" />
     <ClCompile Include="src\core\LevelManager.cpp" />
     <ClCompile Include="src\core\main.cpp" />
-    <ClCompile Include="src\environment\ParticleSystem.cpp" />
+    <ClCompile Include="src\core\ParticleSystem.cpp" />
+    <ClCompile Include="src\environment\ParticleBucket.cpp" />
     <ClCompile Include="src\core\PhysicsEngine.cpp" />
     <ClCompile Include="src\environment\camera.cpp" />
     <ClCompile Include="src\environment\Light.cpp" />
@@ -192,8 +193,9 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <ClInclude Include="src\core\AssetManager.h" />
     <ClInclude Include="src\core\InputHandler.h" />
     <ClInclude Include="src\core\LevelManager.h" />
+    <ClInclude Include="src\core\ParticleSystem.h" />
+    <ClInclude Include="src\environment\ParticleBucket.h" />
     <ClInclude Include="src\environment\ParticleData.h" />
-    <ClInclude Include="src\environment\ParticleSystem.h" />
     <ClInclude Include="src\core\PhysicsEngine.h" />
     <ClInclude Include="src\environment\camera.h" />
     <ClInclude Include="src\environment\Light.h" />

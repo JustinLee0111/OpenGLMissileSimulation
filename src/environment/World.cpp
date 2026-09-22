@@ -1,17 +1,29 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <iostream>
 
 #include "environment/World.h"
 #include "core/AssetManager.h"
 #include "core/LevelManager.h"
+#include "missile/Missile.h"
 
 Camera* World::currentCamera = nullptr;
 
 void World::worldInit() {
 	setAmbientLightColor(glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f });
 	createLight(glm::vec3{ 2.0f, 3.0f, 2.0f }, glm::vec4{0.5f, 0.5f, 0.5f, 0.5f});
-	missileSmoke = std::make_unique<ParticleSystem>();
+	particleSystem.init();
+	particleBuckets.push_back(std::make_unique<ParticleBucket>("missileSmoke"));
+	auto temp = std::make_unique<ParticleBucket>("missileExplosion");
+	temp->emissionType = EmitType::OMNIDIRECTIONAL;
+	temp->particleSpeed = 75.0f;
+	temp->lifeTime = 1.0f;
+	particleBuckets.push_back(std::move(temp));
+
+	loadLevel("assets/levels/MissileSim.json"); // Load default level
+
+	missiles[0]->findRandomTarget(*this);
 }
 
 // Creates an object and constructs it based on inputted parameters
@@ -29,6 +41,14 @@ Object* World::spawnObject(const std::string& filepath) {
 Missile* World::spawnMissile(const std::string& filepath) {
 	auto obj = std::make_unique<Missile>();
 	obj->model = AssetManager::loadModel(filepath);
+
+	for (auto& bucket : particleBuckets) {
+		if (bucket->bucketName == "missileSmoke") { 
+			obj->setParticles(*bucket); 
+			break;
+		}	
+	}
+
 	Missile* ptr = obj.get();
 	ptr->addPhysics();
 	physicsEngine.addPhysObject(ptr);
@@ -40,6 +60,12 @@ Missile* World::spawnMissile(const std::string& filepath) {
 
 void World::loadLevel(const std::string& filepath) {
 	LevelManager::loadLevel(filepath, *this);
+	for (auto& camera : cameras) {
+		if (camera->chase) {
+			camera->chaseObject = missiles[0];
+		}
+	}
+	missiles[0]->findRandomTarget(*this);
 }
 
 // Doesn't unload lights currently
@@ -50,6 +76,11 @@ void World::unloadLevel() {
 	physicsEngine.physObjects.clear();
 	AssetManager::clearCache();
 	currentCamera = nullptr;
+	for (auto& camera : cameras) {
+		if (camera->chase) {
+			camera->chaseObject = nullptr;
+		}
+	}
 }
 
 Camera* World::createCamera(glm::vec3 cameraPosition) {
@@ -68,8 +99,41 @@ Light* World::createLight(glm::vec3 lightPos, glm::vec4 lightColor) {
 }
 
 void World::update(){
-	physicsEngine.update();
-	for (auto& missile : missiles) {
-		missile->update(*this, physicsEngine.getPhysicsRate());
+	if (!objects.empty()) {
+		physicsEngine.update();
 	}
+	for (auto& missile : missiles) {
+		if (missile) {
+			missile->update(*this, physicsEngine.getPhysicsRate());
+		}
+	}
+	for (auto& missile : missiles) {
+		if(missile->proximityFuseTrig(*this)) {
+			for (auto& bucket : particleBuckets) {
+				if (bucket->bucketName == "missileExplosion") {
+					bucket->emitParticles(missile->position);
+					for (auto& camera : cameras) {
+						if (camera->chase) {
+							camera->chaseObject = nullptr;
+						}
+					}
+					deleteObj(missile->objName);
+					for (auto& obj : objects) {
+						if (obj->health <= 0.0f) {
+							deleteObj(obj->objName);
+						}
+					}
+				}
+			}
+		}
+	}
+	for (auto& particleBucket : particleBuckets) {
+		particleSystem.updateParticles(particleBuckets, physicsEngine.getPhysicsRate());
+	}
+}
+
+void World::deleteObj(std::string deleteName) {
+	std::erase_if(missiles, [deleteName](Missile* missile) {return missile->objName == deleteName; });
+	std::erase_if(physicsEngine.physObjects, [deleteName](Object* obj) {return obj->objName == deleteName; });
+	std::erase_if(objects, [deleteName](std::unique_ptr<Object>& obj) {return obj->objName == deleteName; });
 }

@@ -15,6 +15,7 @@ class Renderer {
 			shader->use();
 		}
 		void draw(const World& world, float aspectRatio);
+		void drawParticles(const World& world, float aspectRatio);
 		Shader& getShader(){
 			return *shader;
 		}

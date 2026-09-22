@@ -6,8 +6,8 @@
 struct HitData {
 	Object* objectHit = nullptr;
 	Object* objectHitter = nullptr;
-	float distance = 0.0f;
-	float timeToHit = -1.0f;
+	float distance{ 0.0f };
+	float timeToHit{ -1.0f };
 	glm::vec3 relativeVelocity{ 0.0f };
 	glm::vec3 hitPoint{ 0.0f }; // Not used but could be useful for dynamic decals
 	glm::vec3 normal{ 0.0f };
@@ -19,9 +19,9 @@ public:
 	// Actual objects are managed by World
 	std::vector<Object*> physObjects;
 
-	glm::vec3 gravity = { 0.0f, -9.81f, 0.0f };
-	const float threshold = 0.00001f; // Threshold for floating point errors and small calculation deviations
-	const float restingThreshold = 0.5f; // Threshold for speeds to start resting
+	glm::vec3 gravity{ 0.0f, -9.81f, 0.0f };
+	const float threshold{ 0.00001f }; // Threshold for floating point errors and small calculation deviations
+	const float restingThreshold{ 0.5f }; // Threshold for speeds to start resting
 
 	void update();
 	void kinematicUpdater(float timeLeft);

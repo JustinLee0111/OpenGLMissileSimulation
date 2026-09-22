@@ -18,6 +18,8 @@
 // --- CONTROLS ---
 // Left Alt - Lock/Unlock Camera to Mouse
 // Escape - Exit Program
+// 1 - Camera 1 (Missile chase camera in MissileSim.json level, or default cam)
+// 2 - Camera 2 (If it exists in the level)
 // 
 // W - Add forward velocity
 // A - Add left velocity
@@ -27,6 +29,7 @@
 // Right Arrow - Rotate clockwise
 // R - Disable/Enable Missile Seeker
 // Space - Enable missile's engine
+// Left Shift - Find target within gimbal limit
 // 
 // U - Unload level
 // M - Load fast missile level
@@ -35,7 +38,6 @@
 // V - Load level with a still missile
 // L - Load level
 // T - Load level with moving plane
-
 
 using namespace std;
 

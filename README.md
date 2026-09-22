@@ -17,12 +17,15 @@ and Justin M. Lloyd.
 **<u>--- CONTROLS ---</u>**
 - Left Alt - Lock/Unlock Camera to Mouse
 - Escape - Exit Program
+- 1 - Camera 1 (Missile chase cam)
+- 2 - Camera 2 (If it exists in level)
 - W - Add forward velocity to missile
 - A - Add left velocity to missile
 - S - Add back velocity to missile
 - D - Add right velocity to missile
 - R - Enable/Disable Missile Seeker
 - Space - Enable missile's engine (3 Sec burn time)
+- Left Shift - Lock target within gimbal limit
 - Left Arrow - Rotate counter-clockwise
 - Right Arrow - Rotate clockwise
 - M - Load fast missile level
@@ -33,9 +36,10 @@ and Justin M. Lloyd.
 - T - Load level with moving plane
   
   **<u>-- FEATURES --</u>**
-- Working basic missile simulation using proportional navigation with an engine
-- Continuous Collision Detection solver with both conservative advancement and analytical Time of Impact (TOI) solver.
-- Bounded plane collisions with dynamic normals for edge collisions (only for sphere and plane collisions).
+- Working basic missile simulation using proportional navigation with an engine and proxy fuse
+- Continuous Collision Detection solver with both conservative advancement and analytical Time of Impact (TOI) solver
+- Bounded plane collisions with dynamic normals for edge collisions (only for sphere and plane collisions)
+- Working particle system for missile and explosion
 - Sphere on sphere collisions using impulses
 - Dynamic level loading with JSON level data
 - Seeker object tracking with gimbal limits

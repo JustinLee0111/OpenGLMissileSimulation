@@ -31,14 +31,17 @@ public:
 
 	const float maxSlewRate{ glm::radians(100.0f) }; // Radians per second
 	const float gimbalLimit{ glm::pi<float>() / 1.1f}; // In radians, total gimbal range. NOT FROM MISSILE BORESIGHT
-	const float maxRange{ 500.0f };
+	const float maxRange{ 10000.0f };
 	const float recenterDelay{ 0.0f };
+	const float tempThreshold{ 100.0f };
 
 	void update(const World& world, Missile& missile, float deltaTime);
 	void updateSeekerState();
 	void clampGimbal(Missile& missile); // Clamps how much the fov can rotate based on gimbal limit
 	void scan(const World& world, Missile& missile, float deltaTime); // Scans seeker FOV for any targets, need to create targeting priority for multiple targets
 	void updateSeekerAngle(Missile& missile);
+
+	void findRandomTarget(World& world, Missile& missile); // Locks a random target within the gimbal limit, kind of like helmet cue system
 
 	const glm::vec3 getLOSrate() const{
 		return curSeekerData.losRate;
