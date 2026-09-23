@@ -26,7 +26,11 @@ class Missile : public Object {
 			return proNavGain * seeker->getLOSrate();
 		}
 
-		void setParticles(ParticleBucket& particles) { this->particles = &particles; }
+		glm::vec3 getAeroForce() {
+			return aeroForce;
+		}
+
+		void setParticles(ParticleBucket& particles) { this->smokeParticles = &particles; }
 
 		void proNav(float deltaTime); // Uses proportional navigation to correct flight path for collision
 
@@ -40,7 +44,7 @@ class Missile : public Object {
 
 	private:
 		std::unique_ptr<MissileSeeker> seeker = std::make_unique<MissileSeeker>();
-		ParticleBucket* particles = nullptr;
+		ParticleBucket* smokeParticles = nullptr; // Breaks responsibility ownership with world but didn't want to search bucket everytime for smoke
 
 		float proNavGain{ 3.5f }; // Gain for how aggressive the missile gets on optimal flight path, higher = more aggressive turning earlier
 		float maxAngVel{ glm::pi<float>() }; // Radians per second
@@ -50,7 +54,7 @@ class Missile : public Object {
 
 		float wingSurfaceArea{ 0.25f }; // In m^2
 		float wingFrontSurfaceArea{ 0.025f }; // Frontal surface area for drag calculations, also in m^2
-		float speedMaxTurn{ 100.0f }; // The speed at which the missile has the best turn rate
+		float speedMaxTurn{ 400.0f }; // The speed at which the missile has the best turn rate
 
 		float proxyTrigDist{ 5.0f }; // Distance from edge of missile to target edge for triggering proxy fuse
 		float explosionDamage{ 100.0f };

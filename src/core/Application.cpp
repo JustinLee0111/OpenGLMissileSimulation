@@ -68,11 +68,11 @@ void Application::runApp(){
 		}
 		if (world.currentCamera) {
 			appRenderer.draw(world, getAspectRatio());
-			//if(!world.objects.empty()){}
 			world.getParticleSystem().draw(world, getAspectRatio());
 		}
 		for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
 			Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front); // Gimbal limit visual
+			Debugging::cone(glm::radians(2.0f), 2.0f, missile->position, missile->getAeroForce());
 			if (!missile->getSeeker().getSeekerOn()) { continue; }
 			glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
 			glm::vec3 worldLookDirection = (missile->rotationQ * missile->getSeeker().seekerOrientation) * forward; // Convert local to world look direction vector

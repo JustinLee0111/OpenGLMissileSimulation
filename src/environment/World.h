@@ -34,6 +34,8 @@ public:
 
 	float airDensity = 1.0f; // kg/m^3
 
+	float ambientTemp = 23.0f; // Temp in celcius
+
 	static Camera* currentCamera;
 
 	World() = default;
@@ -61,6 +63,8 @@ public:
 	const float getAmbientLightStrength() const {
 		return worldLightSettings.ambientLightStrength;
 	}
+
+	ParticleBucket* getParticleBucket(std::string bucketName);
 
 	void loadLevel(const std::string& filepath);
 	void unloadLevel();

@@ -2,6 +2,7 @@
 #include "environment/World.h"
 #include "rendering/Model.h"
 #include "rendering/Shader.h"
+#include "environment/ParticleBucket.h"
 
 #include <iostream>
 #include <memory>
@@ -15,6 +16,7 @@ void ParticleSystem::init() {
 // Independent rendering/drawing for particles only
 // Particles don't have a model matrix but are "billboards" that face the camera
 // Separate draw and shaders to do billboards
+// Extremely laggy with high amount of particles spawned, will optimize
 void ParticleSystem::draw(World& world, float aspectRatio) const{
 	particleShader->use();
 
@@ -43,13 +45,7 @@ void ParticleSystem::draw(World& world, float aspectRatio) const{
 
 void ParticleSystem::updateParticles(std::vector<std::unique_ptr<ParticleBucket>>& buckets, float deltaTime) {
 	for (auto& particleBucket : buckets) {
-		if (particleBucket->emissionType == EmitType::UNIDIRECTIONAL) {
-			particleBucket->spawnDirectionalParticle(deltaTime, gen);
-		}
-		else {
-			particleBucket->spawnOmniDirectionalParticle(gen); // Hardcoded 360 particle emission on the same frame
-		}
-
+		particleBucket->spawnBucket(deltaTime, gen);
 		for (auto& particle : particleBucket->particles) { // Moves the active particles based on it's velocity
 			if (!particle.active) { continue; }
 
@@ -61,5 +57,17 @@ void ParticleSystem::updateParticles(std::vector<std::unique_ptr<ParticleBucket>
 			}
 			particle.position += particle.velocity * deltaTime;
 		}
+	}
+}
+
+void ParticleSystem::clearEmittingObjs(std::vector<std::unique_ptr<ParticleBucket>>& buckets) {
+	for (auto& bucket : buckets) {
+		bucket->clearObjs();
+	}
+}
+
+void ParticleSystem::stopEmitting(std::vector<std::unique_ptr<ParticleBucket>>& buckets){
+	for (auto& bucket : buckets) {
+		bucket->stopEmit();
 	}
 }

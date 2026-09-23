@@ -26,6 +26,8 @@ public:
 	std::shared_ptr<Model> model;
 
 	float temperature{ 400.0f };
+	float tempTransferCoef{ 0.75f }; // Temp transfer ignores surface area, uses this only to control transfer rate
+
 	float health{ 100.0f };
 
 	Object() = default;

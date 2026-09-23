@@ -13,13 +13,13 @@ void Missile::update(World& world, float deltaTime) {
 	seeker->update(world, *this, deltaTime);
 	proNav(deltaTime);
 	if (engineOn && burnTimeRemaining > 0.0f) { // While engine is on and has fuel remaining, emit smoke trail and add thrust
-		particles->emitParticles(position, -front);
+		smokeParticles->emitParticles(this, -front);
 		physicsProperties->addForce(rotationQ * engineThrust);
 		burnTimeRemaining -= deltaTime;
 	}
 	else if(burnTimeRemaining <= 0.0f){
 		engineOn = false;
-		particles->stopEmit();
+		smokeParticles->stopEmit();
 	}
 	if (seeker->curState == SeekerState::Scanning) {
 		physicsProperties->angularVelocity = glm::vec3{ 0.0f };
@@ -82,11 +82,15 @@ void Missile::updateAeroForce(float airDensity, float deltaTime) {
 	}
 	float angleOfAttack = glm::acos(glm::clamp(glm::dot(front, normVel), -1.0f, 1.0f));
 
-	// Once velocity exceeds 1000, it starts limiting AOA to prevent excessive G-Forces
+	// Once velocity exceeds 1000, it starts limiting AOA to reduce excessive forces
 	// Fixes exponential lift and drag force gain at extremely high speeds
-	if (glm::length(physicsProperties->velocity) > 1000.0f) {
+	float vel = glm::length(physicsProperties->velocity);
+	if (vel > 1000.0f) {
 		angleOfAttack = glm::clamp(angleOfAttack, 0.0f, (glm::pi<float>() / 16.0f) / std::sqrt(glm::length(physicsProperties->velocity)));
 	}
+	/*if (angleOfAttack > glm::pi<float>() / 2.0f) {
+		angleOfAttack -= glm::pi<float>() / 2.0f;
+	}*/
 
 	float division = (airDensity * glm::dot(physicsProperties->velocity, physicsProperties->velocity)) / 2.0f;
 
@@ -94,7 +98,7 @@ void Missile::updateAeroForce(float airDensity, float deltaTime) {
 	float dragCoeff = angleOfAttack + 0.01f; // AOA plus parasitic drag
 
 	glm::vec3 rotateAxis{ left };
-	glm::vec3 liftDir{ up };
+	glm::vec3 liftDir{ 0.0f };
 
 	// Sets the direction of the lift direction to be perpendicular to missile body
 	if (glm::dot(normVel, front) > 0.0f) {
@@ -119,7 +123,7 @@ bool Missile::proximityFuseTrig(World& world){
 		float dist = (glm::length(missileToObject) - obj->physicsProperties->radius - physicsProperties->radius);
 		if (dist > proxyTrigDist + speedSlop) { continue; }
 		else {
-			particles->stopEmit();
+			smokeParticles->stopEmit();
 			obj->takeDamage(explosionDamage);
 			return true;
 		}

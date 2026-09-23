@@ -16,11 +16,15 @@ class ParticleSystem {
 public:
 	ParticleSystem() = default;
 
-	void draw(World& world, float aspectRatio) const;
+	void draw(World& world, float aspectRatio) const; // Very unoptimized rendering/drawing
 
 	void init();
 
 	void updateParticles(std::vector<std::unique_ptr<ParticleBucket>>& buckets, float deltaTime);
+
+	void stopEmitting(std::vector<std::unique_ptr<ParticleBucket>>& buckets);
+
+	void clearEmittingObjs(std::vector<std::unique_ptr<ParticleBucket>>& buckets);
 private:
 	std::mt19937 gen{ (unsigned int)std::time(0) };
 

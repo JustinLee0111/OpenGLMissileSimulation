@@ -1,25 +1,56 @@
 #include "environment/ParticleBucket.h"
+#include "environment/Object.h"
 
-void ParticleBucket::spawnDirectionalParticle(float deltaTime, std::mt19937& gen) {
+#include <iostream>
+
+void ParticleBucket::spawnDirectionalParticle(float deltaTime, std::mt19937& gen, glm::vec3 initVel) {
 	lastSpawnDeltaT += deltaTime;
-	while (IsEmitting && lastSpawnDeltaT >= spawnDelay) { // While the particles are still being emitted and spawn cooldown is met, find the next particle to spawn
+	if (IsEmitting) { // While the particles are still being emitted and spawn cooldown is met, find the next particle to spawn
 		lastSpawnDeltaT -= spawnDelay;
 		for (auto& particle : particles) { // Goes through the particle array to find a ready particle to be spawned
 			if (!particle.active) {
-				lastSpawnDeltaT = 0.0f; // Resets the time since last spawn since this exact frame is when particle was spawned
-
 				// Adds variance in direction of particle emission
 				float xRand = std::uniform_real_distribution<float>{ -velVariance, velVariance }(gen);
 				float yRand = std::uniform_real_distribution<float>{ -velVariance, velVariance }(gen);
 				float zRand = std::uniform_real_distribution<float>{ -velVariance, velVariance }(gen);
 
 				particle.position = origin;
-				particle.velocity = (direction + glm::vec3{ xRand, yRand, zRand }) * particleSpeed;
+				particle.velocity = (direction + glm::vec3{ xRand, yRand, zRand }) * particleSpeed - spawnVelocity;
 				particle.remainingTime = lifeTime;
 				particle.active = true;
 
 				break;
 			}
+		}
+		if (lastSpawnDeltaT > spawnDelay) {
+			spawnBucket(0, gen);
+		}
+	}
+}
+
+void ParticleBucket::spawnBucket(float deltaTime, std::mt19937& gen) {
+	if (IsEmitting) {
+		if (emissionType == EmitType::UNIDIRECTIONAL) {
+			if (carryVelocity && !emittingObjects.empty()) {
+				for (auto& obj : emittingObjects) {
+					if (emittingObjects.size() > 1 && lastSpawnedObj == obj) {
+						lastSpawnedObj = nullptr;
+						continue;
+					}
+					else {
+						origin = obj->position;
+						lastSpawnedObj = obj;
+						spawnDirectionalParticle(deltaTime, gen, obj->physicsProperties->velocity);
+						return;
+					}
+				}
+			}
+			else if (!carryVelocity) {
+				spawnDirectionalParticle(deltaTime, gen);
+			}
+		}
+		else {
+			spawnOmniDirectionalParticle(gen); // Hardcoded 360 particle emission on the same frame
 		}
 	}
 }
@@ -49,9 +80,19 @@ void ParticleBucket::spawnOmniDirectionalParticle(std::mt19937& gen) {
 	}
 }
 
+
 void ParticleBucket::emitParticles(glm::vec3 origin, glm::vec3 direction) { // This sets the origin and direction for particles to be emitted from
 	this->origin = origin;
 	this->direction = direction;
+	carryVelocity = false;
+	IsEmitting = true; // This tells the particle system to start emitting particles
+}
+
+void ParticleBucket::emitParticles(Object* obj, glm::vec3 direction) { // This sets the origin and direction for particles to be emitted from
+	origin = obj->position;
+	this->direction = direction;
+	spawnVelocity = obj->physicsProperties->velocity;
+	carryVelocity = true;
 	IsEmitting = true; // This tells the particle system to start emitting particles
 }
 
