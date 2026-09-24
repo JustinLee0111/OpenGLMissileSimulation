@@ -10,7 +10,7 @@ int Application::appInit() {
 		return -1;
 	}
 	
-	mainWindow = glfwCreateWindow(getWidth(), getHeight(), "Physics Sim", nullptr, nullptr);
+	mainWindow = glfwCreateWindow(getWidth(), getHeight(), "Missile Sim", nullptr, nullptr);
 	glfwMakeContextCurrent(Application::mainWindow);
 
 	glfwSwapInterval(1); // VSYNC on
@@ -141,11 +141,15 @@ void Application::processKeyBindings() {
 		if (inputs.isKeyPressed(GLFW_KEY_1)) {
 			world.currentCamera = world.cameras[0].get();
 		}
-		if (inputs.isKeyPressed(GLFW_KEY_2)) {
-			world.currentCamera = world.cameras[1].get();
+		if (world.cameras.size() > 1) {
+			if (inputs.isKeyPressed(GLFW_KEY_2)) {
+				world.currentCamera = world.cameras[1].get();
+			}
 		}
-		if (inputs.isKeyPressed(GLFW_KEY_F)) {
-			world.flareBucket->deployFlares(gen, world.objects[1]->position, -world.objects[1]->up, world.objects[1]->physicsProperties->velocity);
+		if (world.objects.size() > 1) {
+			if (inputs.isKeyPressed(GLFW_KEY_F)) {
+				world.flareBucket->deployFlares(gen, world.objects[1]->position, -world.objects[1]->up, world.objects[1]->physicsProperties->velocity);
+			}
 		}
 	}
 

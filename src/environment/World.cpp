@@ -74,12 +74,14 @@ Missile* World::spawnMissile(const std::string& filepath) {
 
 void World::loadLevel(const std::string& filepath) {
 	LevelManager::loadLevel(filepath, *this);
-	for (auto& camera : cameras) {
-		if (camera->chase) {
-			camera->chaseObject = missiles[0];
+	if (!missiles.empty()) {
+		for (auto& camera : cameras) {
+			if (camera->chase) {
+				camera->chaseObject = missiles[0];
+			}
 		}
+		missiles[0]->findRandomTarget(*this);
 	}
-	missiles[0]->findRandomTarget(*this);
 }
 
 // Doesn't unload world lights

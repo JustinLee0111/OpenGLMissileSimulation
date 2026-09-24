@@ -88,9 +88,6 @@ void Missile::updateAeroForce(float airDensity, float deltaTime) {
 	if (vel > 1000.0f) {
 		angleOfAttack = glm::clamp(angleOfAttack, 0.0f, (glm::pi<float>() / 16.0f) / std::sqrt(glm::length(physicsProperties->velocity)));
 	}
-	/*if (angleOfAttack > glm::pi<float>() / 2.0f) {
-		angleOfAttack -= glm::pi<float>() / 2.0f;
-	}*/
 
 	float division = (airDensity * glm::dot(physicsProperties->velocity, physicsProperties->velocity)) / 2.0f;
 

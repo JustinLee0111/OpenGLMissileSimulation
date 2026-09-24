@@ -1,5 +1,6 @@
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <iostream>
 
 #include "environment/World.h"
 #include "core/LevelManager.h"
@@ -44,7 +45,6 @@ void LevelManager::loadLevel(const std::string& filepath, World& world) {
 		if (object.contains("scale")) {
 			spawnedObject->scale = glm::vec3{ object["scale"][0], object["scale"][1], object["scale"][2] };
 		}
-
 		if (object.contains("rotation")) {
 			auto rotation = object["rotation"];
 			auto axis = rotation["axis"];

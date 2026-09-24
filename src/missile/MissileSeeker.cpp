@@ -8,7 +8,6 @@
 #include "environment/Temperature.h"
 
 void MissileSeeker::update(const World& world, Missile& missile, float deltaTime){
-	std::cout << "WOW: " << glm::length(curSeekerData.LOStoTarget) << std::endl;
 	if (curState != SeekerState::Off) {
 		scanFOV(world, missile, deltaTime);
 		updateSeekerState();
@@ -58,8 +57,6 @@ void MissileSeeker::clampGimbal(Missile& missile) {
 void MissileSeeker::scanFOV(const World& world, Missile& missile, float deltaTime){
 	SeekerData objScan = scanObjects(world, missile, deltaTime);
 	SeekerData flareScan = scanFlares(world, missile, deltaTime);
-	std::cout << "WOW1: " << glm::length(objScan.losRate) << std::endl;
-	std::cout << "WOW2: " << glm::length(flareScan.losRate) << std::endl;
 
 	if (objScan.targetTemperature < flareScan.targetTemperature) {
 		curSeekerData = flareScan;
@@ -96,8 +93,6 @@ SeekerData MissileSeeker::scanObjects(const World& world, Missile& missile, floa
 
 			scannedData.oldLOStoTarget = (glm::length(curSeekerData.LOStoTarget) != 0.0f) ? curSeekerData.LOStoTarget : glm::vec3{ 0.0f }; // Sets the old LOS
 			scannedData.LOStoTarget = (glm::length(missileToObj) >= 0.00001f) ? missileToObj : glm::vec3{ 0.0f }; // Gets the new LOS
-			std::cout << "WOW3: " << glm::length(scannedData.LOStoTarget) << std::endl;
-			std::cout << "WOW4: " << glm::length(scannedData.oldLOStoTarget) << std::endl;
 			glm::vec3 oldLos = glm::normalize(scannedData.oldLOStoTarget);
 			glm::vec3 newLos = glm::normalize(scannedData.LOStoTarget);
 

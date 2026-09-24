@@ -24,11 +24,3 @@ void Flares::spawnDirectionalParticle(std::mt19937& gen, glm::vec3 origin, glm::
 void Flares::deployFlares(std::mt19937& gen, glm::vec3 origin, glm::vec3 direction, glm::vec3 initVel) { // This sets the origin and direction for particles to be emitted from
 	spawnDirectionalParticle(gen, origin, direction, initVel);
 }
-
-/*void Flares::emitParticles(Object* obj, glm::vec3 direction) { // This sets the origin and direction for particles to be emitted from
-	origin = obj->position;
-	this->direction = direction;
-	spawnVelocity = obj->physicsProperties->velocity;
-	carryVelocity = true;
-	IsEmitting = true; // This tells the particle system to start emitting particles
-}*/
