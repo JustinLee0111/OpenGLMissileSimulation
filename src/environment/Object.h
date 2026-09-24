@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 
+#include "environment/Temperature.h"
 #include "environment/PhysicsData.h"
 
 class Model;
@@ -25,10 +26,9 @@ public:
 	std::unique_ptr<PhysicsData> physicsProperties;
 	std::shared_ptr<Model> model;
 
-	float temperature{ 400.0f };
-	float tempTransferCoef{ 0.75f }; // Temp transfer ignores surface area, uses this only to control transfer rate
-
 	float health{ 100.0f };
+
+	Temperature objTemp;
 
 	Object() = default;
 	~Object() = default;

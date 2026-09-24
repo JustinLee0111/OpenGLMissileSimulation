@@ -1,6 +1,8 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
+#include <random>
+#include <ctime>
 
 #include "environment/World.h"
 #include "rendering/Renderer.h"
@@ -42,4 +44,5 @@ class Application {
 		int windowHeight = 1440;
 		float accumulator = 0.0f;
 		bool debugEnabled = true;
+		std::mt19937 gen{ (unsigned int)std::time(0) };
 };

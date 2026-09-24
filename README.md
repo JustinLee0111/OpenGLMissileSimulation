@@ -24,6 +24,7 @@ and Justin M. Lloyd.
 - S - Add back velocity to missile
 - D - Add right velocity to missile
 - R - Enable/Disable Missile Seeker
+- F - Deploy Flares
 - Space - Enable missile's engine (3 Sec burn time)
 - Left Shift - Lock target within gimbal limit
 - Left Arrow - Rotate counter-clockwise

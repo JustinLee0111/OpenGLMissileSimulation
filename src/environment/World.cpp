@@ -7,6 +7,7 @@
 #include "core/AssetManager.h"
 #include "core/LevelManager.h"
 #include "missile/Missile.h"
+#include "environment/Flares.h"
 
 Camera* World::currentCamera = nullptr;
 
@@ -29,6 +30,8 @@ void World::worldInit() {
 	missileExplosion->particleSpeed = 75.0f;
 	missileExplosion->lifeTime = 1.0f;
 	particleBuckets.push_back(std::move(missileExplosion));
+
+	flareBucket = std::make_unique<Flares>();
 
 	loadLevel("assets/levels/MissileSim.json"); // Load default level
 
@@ -111,7 +114,7 @@ Light* World::createLight(glm::vec3 lightPos, glm::vec4 lightColor) {
 	return lightPtr;
 }
 
-void World::update(){
+void World::update(std::mt19937& gen){
 	if (!objects.empty()) {
 		physicsEngine.update();
 	}
@@ -140,7 +143,7 @@ void World::update(){
 		}
 	}
 	for (auto& particleBucket : particleBuckets) {
-		particleSystem.updateParticles(particleBuckets, physicsEngine.getPhysicsRate());
+		particleSystem.updateParticles(gen, *this, physicsEngine.getPhysicsRate());
 	}
 }
 

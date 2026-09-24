@@ -58,7 +58,7 @@ void Application::runApp(){
 		accumulator += frameTime;
 		// Ensures physics simulation does fixed time steps regardless of fps
 		while (accumulator >= fixedDeltaTime) {
-			world.update();
+			world.update(gen);
 			accumulator -= fixedDeltaTime;
 		}
 		for (auto& camera : world.cameras) {
@@ -143,6 +143,9 @@ void Application::processKeyBindings() {
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_2)) {
 			world.currentCamera = world.cameras[1].get();
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_F)) {
+			world.flareBucket->deployFlares(gen, world.objects[1]->position, -world.objects[1]->up, world.objects[1]->physicsProperties->velocity);
 		}
 	}
 

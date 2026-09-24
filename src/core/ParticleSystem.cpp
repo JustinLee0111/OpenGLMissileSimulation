@@ -3,6 +3,9 @@
 #include "rendering/Model.h"
 #include "rendering/Shader.h"
 #include "environment/ParticleBucket.h"
+#include "environment/FlareData.h"
+#include "environment/Flares.h"
+
 
 #include <iostream>
 #include <memory>
@@ -38,13 +41,20 @@ void ParticleSystem::draw(World& world, float aspectRatio) const{
 			}
 		}
 	}
+	particleShader->setVec3("scale", world.flareBucket->scale);
+	for (int i = 0; i < world.flareBucket->particles.size(); i++) {
+		if (world.flareBucket->particles[i].active) {
+			particleShader->setVec3("position", world.flareBucket->particles[i].position);
+			world.flareBucket->model->drawOpaque();
+		}
+	}
 
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
 }
 
-void ParticleSystem::updateParticles(std::vector<std::unique_ptr<ParticleBucket>>& buckets, float deltaTime) {
-	for (auto& particleBucket : buckets) {
+void ParticleSystem::updateParticles(std::mt19937& gen, World& world, float deltaTime) {
+	for (auto& particleBucket : world.particleBuckets) {
 		particleBucket->spawnBucket(deltaTime, gen);
 		for (auto& particle : particleBucket->particles) { // Moves the active particles based on it's velocity
 			if (!particle.active) { continue; }
@@ -57,6 +67,18 @@ void ParticleSystem::updateParticles(std::vector<std::unique_ptr<ParticleBucket>
 			}
 			particle.position += particle.velocity * deltaTime;
 		}
+	}
+	for (auto& particle : world.flareBucket->particles) { // Moves the active particles based on it's velocity
+		if (!particle.active) { continue; }
+
+		particle.remainingTime -= deltaTime;
+		particle.particleTemp.temperature -= (particle.particleTemp.tempTransferCoef * (particle.particleTemp.temperature - world.ambientTemp)) * deltaTime;
+
+		if (particle.remainingTime <= 0.0f) {
+			particle.active = false;
+			continue;
+		}
+		particle.position += particle.velocity * deltaTime;
 	}
 }
 

@@ -28,6 +28,7 @@
 // Left Arrow - Rotate counter-clockwise
 // Right Arrow - Rotate clockwise
 // R - Disable/Enable Missile Seeker
+// F - Deploy Flares
 // Space - Enable missile's engine
 // Left Shift - Find target within gimbal limit
 // 

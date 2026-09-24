@@ -60,7 +60,7 @@ public:
 	glm::vec3 direction{ 0.0f };
 	glm::vec3 scale{ 0.1f, 0.1f, 0.1f };
 
-	bool carryVelocity{ false }; // If particles should carry origin object velocity
+	bool carryVelocity{ false }; // If particles should carry over origin object velocity
 	glm::vec3 spawnVelocity{ 0.0f };
 
 	float velVariance{ 0.05f };
@@ -69,7 +69,7 @@ public:
 	float lifeTime{ 0.2f };
 	float lastSpawnDeltaT{ 0.0f };
 
-	std::array<ParticleData, 500> particles; // An array of particles, max of 1000 particles at a given time
+	std::array<ParticleData, 500> particles; // An array of particles, max of 500 particles at a given time
 
 	bool IsEmitting = false;
 	float spawnDelay = 0.0001f; // Delay between particle spawns in seconds

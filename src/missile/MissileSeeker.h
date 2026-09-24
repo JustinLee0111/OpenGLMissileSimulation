@@ -21,6 +21,21 @@ enum class SeekerState {
 	Off // Seeker scanning off but can still transmit data, useful for IRCCM
 };
 
+struct SeekerData {
+	bool tracking = false;
+
+	glm::quat rotateToTarget{ 1.0f, 0.0f, 0.0f, 0.0f }; // How much to rotate current seeker quaternion by to point towards target
+
+	float targetTemperature{ 0.0f };
+
+	float seekerAngleToTarget{ 0.0f };
+
+	glm::vec3 oldLOStoTarget{ 0.0f };
+	glm::vec3 LOStoTarget{ 0.0f };
+
+	glm::vec3 losRate{ 0.0f }; // Line of Sight Rate, if this zero or near zero, it means current flight path is optimal for collision
+};
+
 class MissileSeeker {
 public:
 	SeekerState curState = SeekerState::Scanning;
@@ -38,7 +53,9 @@ public:
 	void update(const World& world, Missile& missile, float deltaTime);
 	void updateSeekerState();
 	void clampGimbal(Missile& missile); // Clamps how much the fov can rotate based on gimbal limit
-	void scan(const World& world, Missile& missile, float deltaTime); // Scans seeker FOV for any targets, need to create targeting priority for multiple targets
+	void scanFOV(const World& world, Missile& missile, float deltaTime); // Scans seeker FOV for any targets, need to create targeting priority for multiple targets
+	SeekerData scanFlares(const World& world, Missile& missile, float deltaTime);
+	SeekerData scanObjects(const World& world, Missile& missile, float deltaTime);
 	void updateSeekerAngle(Missile& missile);
 
 	void findRandomTarget(World& world, Missile& missile); // Locks a random target within the gimbal limit, kind of like helmet cue system
@@ -73,20 +90,6 @@ public:
 
 	bool seekerEnabled = true;
 private:
-	struct SeekerData {
-		bool tracking = false;
-
-		glm::quat rotateToTarget{ 1.0f, 0.0f, 0.0f, 0.0f }; // How much to rotate current seeker quaternion by to point towards target
-
-		float targetTemperature{ 0.0f };
-
-		float seekerAngleToTarget{ 0.0f };
-
-		glm::vec3 oldLOStoTarget{ 0.0f };
-		glm::vec3 LOStoTarget{ 0.0f };
-
-		glm::vec3 losRate{ 0.0f }; // Line of Sight Rate, if this zero or near zero, it means current flight path is optimal for collision
-	};
 
 	float angleFOV{ glm::pi<float>() / 45.0f }; // Degrees
 	float seekerAngle{ 0.0f };

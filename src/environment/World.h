@@ -10,6 +10,7 @@
 #include "environment/camera.h"
 #include "environment/Light.h"
 #include "missile/Missile.h"
+#include "environment/Flares.h"
 
 class InputHandler;
 class Object;
@@ -31,6 +32,7 @@ public:
 	std::vector<std::unique_ptr<Light>> lights;
 	std::vector<Missile*> missiles;
 	std::vector<std::unique_ptr<ParticleBucket>> particleBuckets;
+	std::unique_ptr<Flares> flareBucket = nullptr;
 
 	float airDensity = 1.0f; // kg/m^3
 
@@ -69,7 +71,7 @@ public:
 	void loadLevel(const std::string& filepath);
 	void unloadLevel();
 
-	void update();
+	void update(std::mt19937& gen);
 
 	void updateParticles(float deltaTime);
 

@@ -5,10 +5,12 @@
 #include "missile/Missile.h"
 #include "environment/World.h"
 #include "environment/Object.h"
+#include "environment/Temperature.h"
 
 void MissileSeeker::update(const World& world, Missile& missile, float deltaTime){
+	std::cout << "WOW: " << glm::length(curSeekerData.LOStoTarget) << std::endl;
 	if (curState != SeekerState::Off) {
-		scan(world, missile, deltaTime);
+		scanFOV(world, missile, deltaTime);
 		updateSeekerState();
 		
 		if (curState == SeekerState::Tracking) {
@@ -22,6 +24,7 @@ void MissileSeeker::update(const World& world, Missile& missile, float deltaTime
 	}
 	updateSeekerAngle(missile);
 	clampGimbal(missile);
+	curSeekerData.tracking = false;
 }
 
 void MissileSeeker::updateSeekerState() {
@@ -52,7 +55,22 @@ void MissileSeeker::clampGimbal(Missile& missile) {
 	}
 }
 
-void MissileSeeker::scan(const World& world, Missile& missile, float deltaTime){
+void MissileSeeker::scanFOV(const World& world, Missile& missile, float deltaTime){
+	SeekerData objScan = scanObjects(world, missile, deltaTime);
+	SeekerData flareScan = scanFlares(world, missile, deltaTime);
+	std::cout << "WOW1: " << glm::length(objScan.losRate) << std::endl;
+	std::cout << "WOW2: " << glm::length(flareScan.losRate) << std::endl;
+
+	if (objScan.targetTemperature < flareScan.targetTemperature) {
+		curSeekerData = flareScan;
+	}
+	else {
+		curSeekerData = objScan;
+	}
+}
+
+SeekerData MissileSeeker::scanObjects(const World& world, Missile& missile, float deltaTime) {
+	SeekerData scannedData;
 	glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
 	glm::vec3 localLookDirection = seekerOrientation * forward; // Makes the seeker look direction
 	glm::vec3 worldLookDirection = (missile.rotationQ * seekerOrientation) * forward; // Convert local to world seeker look direction vector
@@ -72,35 +90,93 @@ void MissileSeeker::scan(const World& world, Missile& missile, float deltaTime){
 		float radiusAtDistance = glm::tan(theta) * normalDistance; // Gets the radius of cone at the distance the object is at along cone
 
 		// If object is within seeker FOV, start tracking
-		if (distanceFovCenterToObj < radiusAtDistance + obj->physicsProperties->radius && obj->temperature >= tempThreshold) { 
-			curSeekerData.tracking = true;
+		if (distanceFovCenterToObj < radiusAtDistance + obj->physicsProperties->radius && obj->objTemp.temperature >= tempThreshold) {
+			scannedData.tracking = true;
+			scannedData.targetTemperature = obj->objTemp.temperature;
 
-			curSeekerData.oldLOStoTarget = (glm::length(curSeekerData.LOStoTarget) != 0.0f) ? curSeekerData.LOStoTarget : glm::vec3{ 0.0f }; // Sets the old LOS
-			curSeekerData.LOStoTarget = (glm::length(missileToObj) >= 0.00001f) ? missileToObj : glm::vec3{ 0.0f }; // Gets the new LOS
-			glm::vec3 oldLos = glm::normalize(curSeekerData.oldLOStoTarget);
-			glm::vec3 newLos = glm::normalize(curSeekerData.LOStoTarget);
+			scannedData.oldLOStoTarget = (glm::length(curSeekerData.LOStoTarget) != 0.0f) ? curSeekerData.LOStoTarget : glm::vec3{ 0.0f }; // Sets the old LOS
+			scannedData.LOStoTarget = (glm::length(missileToObj) >= 0.00001f) ? missileToObj : glm::vec3{ 0.0f }; // Gets the new LOS
+			std::cout << "WOW3: " << glm::length(scannedData.LOStoTarget) << std::endl;
+			std::cout << "WOW4: " << glm::length(scannedData.oldLOStoTarget) << std::endl;
+			glm::vec3 oldLos = glm::normalize(scannedData.oldLOStoTarget);
+			glm::vec3 newLos = glm::normalize(scannedData.LOStoTarget);
 
 			// LOS CALCULATIONS
 			glm::vec3 rotationAxis = glm::conjugate(missile.rotationQ) * glm::cross(oldLos, newLos); // Gets the world space losRate and converts it to local space
 			float rotationMag = glm::clamp(glm::length(rotationAxis), -1.0f, 1.0f);
 			if (rotationMag < 0.00001f) { // Checks if losRate is negligible to stop more calculations from happening
-				curSeekerData.losRate = glm::vec3{ 0.0f };
-				curSeekerData.rotateToTarget = glm::quat{ 1.0f, 0.0f, 0.0f ,0.0f };
-				return;
+				scannedData.losRate = glm::vec3{ 0.0f };
+				scannedData.rotateToTarget = glm::quat{ 1.0f, 0.0f, 0.0f ,0.0f };
+				scannedData.tracking = true;
+				return scannedData;
 			}
-			float rotateAngle = glm::asin( rotationMag );
+			float rotateAngle = glm::asin(rotationMag);
 			glm::vec3 losRate = (glm::normalize(rotationAxis) * rotateAngle) / deltaTime;
-			curSeekerData.losRate = (glm::length(losRate) > 0.0001f) ? losRate : glm::vec3{ 0.0f }; // Filter out negligible losRates
+			scannedData.losRate = (glm::length(losRate) > 0.0001f) ? losRate : glm::vec3{ 0.0f }; // Filter out negligible losRates
 
 			// SEEKER ROTATION CALCULATIONS
 			missileToObj = glm::normalize(glm::conjugate(missile.rotationQ) * missileToObj); // Converts the target's coordinates to the missile's local space then the seeker's local space
-			glm::quat rotate = glm::normalize( glm::rotation(localLookDirection, missileToObj) );
-			curSeekerData.rotateToTarget = rotate; // Gets the quaternion to rotate the current seeker quaternion to the target
+			glm::quat rotate = glm::normalize(glm::rotation(localLookDirection, missileToObj));
+			scannedData.rotateToTarget = rotate; // Gets the quaternion to rotate the current seeker quaternion to the target
+			scannedData.tracking = true;
 
-			return;
+			return scannedData;
 		}
 	}
-	curSeekerData.tracking = false;
+	return scannedData;
+}
+
+SeekerData MissileSeeker::scanFlares(const World& world, Missile& missile, float deltaTime) {
+	SeekerData scannedData;
+	glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
+	glm::vec3 localLookDirection = seekerOrientation * forward; // Makes the seeker look direction
+	glm::vec3 worldLookDirection = (missile.rotationQ * seekerOrientation) * forward; // Convert local to world seeker look direction vector
+
+	for (auto& flare : world.flareBucket->particles) {
+		if (!flare.active) { continue; }
+		glm::vec3 missileToFlare = flare.position - missile.position;
+		float normalDistance = glm::dot(missileToFlare, worldLookDirection);
+
+		if (normalDistance >= maxRange || normalDistance <= 0.0f) continue; // If object out of seeker max range, object is skipped
+
+		glm::vec3 fovCenterToObj = missileToFlare - normalDistance * worldLookDirection; // Center of cone to the object
+		float distanceFovCenterToObj = glm::length(fovCenterToObj);
+
+		float theta = angleFOV / 2.0f; // Gets angle of half of cone to find radius at specific distance using trig
+		float radiusAtDistance = glm::tan(theta) * normalDistance; // Gets the radius of cone at the distance the object is at along cone
+
+		// If object is within seeker FOV, start tracking
+		if (distanceFovCenterToObj < radiusAtDistance && flare.particleTemp.temperature >= tempThreshold) {
+			scannedData.tracking = true;
+			scannedData.targetTemperature = flare.particleTemp.temperature;
+
+			scannedData.oldLOStoTarget = (glm::length(curSeekerData.LOStoTarget) != 0.0f) ? curSeekerData.LOStoTarget : glm::vec3{ 0.0f }; // Sets the old LOS
+			scannedData.LOStoTarget = (glm::length(missileToFlare) >= 0.00001f) ? missileToFlare : glm::vec3{ 0.0f }; // Gets the new LOS
+			glm::vec3 oldLos = glm::normalize(scannedData.oldLOStoTarget);
+			glm::vec3 newLos = glm::normalize(scannedData.LOStoTarget);
+
+			// LOS CALCULATIONS
+			glm::vec3 rotationAxis = glm::conjugate(missile.rotationQ) * glm::cross(oldLos, newLos); // Gets the world space losRate and converts it to local space
+			float rotationMag = glm::clamp(glm::length(rotationAxis), -1.0f, 1.0f);
+			if (rotationMag < 0.00001f) { // Checks if losRate is negligible to stop more calculations from happening
+				scannedData.losRate = glm::vec3{ 0.0f };
+				scannedData.rotateToTarget = glm::quat{ 1.0f, 0.0f, 0.0f ,0.0f };
+				scannedData.tracking = true;
+				return scannedData;
+			}
+			float rotateAngle = glm::asin(rotationMag);
+			glm::vec3 losRate = (glm::normalize(rotationAxis) * rotateAngle) / deltaTime;
+			scannedData.losRate = (glm::length(losRate) > 0.0001f) ? losRate : glm::vec3{ 0.0f }; // Filter out negligible losRates
+
+			// SEEKER ROTATION CALCULATIONS
+			missileToFlare = glm::normalize(glm::conjugate(missile.rotationQ) * missileToFlare); // Converts the target's coordinates to the missile's local space then the seeker's local space
+			glm::quat rotate = glm::normalize(glm::rotation(localLookDirection, missileToFlare));
+			scannedData.rotateToTarget = rotate; // Gets the quaternion to rotate the current seeker quaternion to the target
+			scannedData.tracking = true;
+			return scannedData;
+		}
+	}
+	return scannedData;
 }
 
 void MissileSeeker::updateSeekerAngle(Missile& missile) {
@@ -128,7 +204,7 @@ void MissileSeeker::findRandomTarget(World& world, Missile& missile){
 		float radiusAtDistance = glm::tan(theta) * normalDistance; // Gets the radius of cone at the distance the object is at along cone
 
 		// If object is within seeker FOV, start tracking
-		if (distanceFovCenterToObj < radiusAtDistance + obj->physicsProperties->radius && obj->temperature >= tempThreshold) {
+		if (distanceFovCenterToObj < radiusAtDistance + obj->physicsProperties->radius && obj->objTemp.temperature >= tempThreshold) {
 			// SEEKER ROTATION CALCULATIONS
 			missileToObj = glm::conjugate(missile.rotationQ) * glm::normalize(missileToObj); // Converts the target's coordinates to the missile's local space then the seeker's local space
 			seekerOrientation = glm::rotation(forward, missileToObj);
