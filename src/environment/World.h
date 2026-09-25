@@ -71,7 +71,8 @@ public:
 	void loadLevel(const std::string& filepath);
 	void unloadLevel();
 
-	void update(std::mt19937& gen);
+	void fixedUpdate(std::mt19937& gen);
+	void update();
 
 	void updateParticles(float deltaTime);
 

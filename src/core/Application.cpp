@@ -48,7 +48,6 @@ void Application::runApp(){
 		glfwPollEvents();
 		processKeyBindings();
 		inputs.update(mainWindow);
-
 		float currentFrame = (float)glfwGetTime();
 		float frameTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
@@ -58,29 +57,37 @@ void Application::runApp(){
 		accumulator += frameTime;
 		// Ensures physics simulation does fixed time steps regardless of fps
 		while (accumulator >= fixedDeltaTime) {
-			world.update(gen);
+			world.fixedUpdate(gen);
 			accumulator -= fixedDeltaTime;
 		}
-		for (auto& camera : world.cameras) {
-			if (camera->chaseObject) {
-				camera->cameraPos = camera->chaseObject->position + glm::vec3{ -25.0f, 5.0f, 0.0f };
-			}
-		}
+
+		world.update();
+
 		if (world.currentCamera) {
 			appRenderer.draw(world, getAspectRatio());
 			world.getParticleSystem().draw(world, getAspectRatio());
 		}
-		for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
-			Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front); // Gimbal limit visual
-			Debugging::cone(glm::radians(2.0f), 2.0f, missile->position, missile->getAeroForce());
-			if (!missile->getSeeker().getSeekerOn()) { continue; }
-			glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
-			glm::vec3 worldLookDirection = (missile->rotationQ * missile->getSeeker().seekerOrientation) * forward; // Convert local to world look direction vector
-			Debugging::cone(missile->getSeeker().getSeekerFOV(), missile->getSeeker().maxRange, missile->position, worldLookDirection); // Seeker FOV visual
+		if (debugEnabled) {
+			debugging();
 		}
-
 		inputs.keysUpdate();
 		glfwSwapBuffers(mainWindow);
+	}
+}
+
+void Application::debugging() {
+	for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
+		Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front); // Gimbal limit visual
+
+		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->getAeroForce())), missile->position, missile->getAeroForce()); // Aero force
+
+		glm::vec3 velocityDebug = (glm::length(missile->physicsProperties->velocity) > 0.0f) ? (missile->physicsProperties->velocity) : missile->front; 
+		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->physicsProperties->velocity)), missile->position, velocityDebug); // Velocity
+
+		if (!missile->getSeeker().getSeekerOn()) { continue; }
+		glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
+		glm::vec3 worldLookDirection = (missile->rotationQ * missile->getSeeker().seekerOrientation) * forward; // Convert local to world look direction vector
+		Debugging::cone(missile->getSeeker().getSeekerFOV(), missile->getSeeker().maxRange, missile->position, worldLookDirection); // Seeker FOV visual
 	}
 }
 
@@ -180,6 +187,10 @@ void Application::processKeyBindings() {
 	if (inputs.isKeyPressed(GLFW_KEY_V)) {
 		world.unloadLevel();
 		world.loadLevel("assets/levels/MissileSimStill.json");
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_C)) {
+		world.unloadLevel();
+		world.loadLevel("assets/levels/ChaseCamTest.json");
 	}
 }
 

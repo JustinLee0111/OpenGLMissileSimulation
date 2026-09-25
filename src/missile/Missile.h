@@ -46,7 +46,7 @@ class Missile : public Object {
 		std::unique_ptr<MissileSeeker> seeker = std::make_unique<MissileSeeker>();
 		ParticleBucket* smokeParticles = nullptr; // Breaks responsibility ownership with world but didn't want to search bucket everytime for smoke
 
-		float proNavGain{ 3.5f }; // Gain for how aggressive the missile gets on optimal flight path, higher = more aggressive turning earlier
+		float proNavGain{ 4.0f }; // Gain for how aggressive the missile gets on optimal flight path, higher = more aggressive turning earlier
 		float maxAngVel{ glm::pi<float>() }; // Radians per second
 
 		float engineBurnTime{ 5.0f }; // Burn time in seconds

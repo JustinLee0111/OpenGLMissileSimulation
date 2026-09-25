@@ -116,7 +116,7 @@ Light* World::createLight(glm::vec3 lightPos, glm::vec4 lightColor) {
 	return lightPtr;
 }
 
-void World::update(std::mt19937& gen){
+void World::fixedUpdate(std::mt19937& gen){
 	if (!objects.empty()) {
 		physicsEngine.update();
 	}
@@ -146,6 +146,12 @@ void World::update(std::mt19937& gen){
 	}
 	for (auto& particleBucket : particleBuckets) {
 		particleSystem.updateParticles(gen, *this, physicsEngine.getPhysicsRate());
+	}
+}
+
+void World::update() {
+	if (currentCamera->chaseObject && currentCamera && currentCamera->chase) {
+		currentCamera->cameraChaseUpdate();
 	}
 }
 

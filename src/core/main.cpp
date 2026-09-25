@@ -30,7 +30,7 @@
 // R - Disable/Enable Missile Seeker
 // F - Deploy Flares
 // Space - Enable missile's engine
-// Left Shift - Find target within gimbal limit
+// Left Shift - Find and lock seeker to target within gimbal limit
 // 
 // U - Unload level
 // M - Load fast missile level
@@ -39,6 +39,7 @@
 // V - Load level with a still missile
 // L - Load level
 // T - Load level with moving plane
+// C - Load chase cam missile testing
 
 using namespace std;
 

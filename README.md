@@ -26,7 +26,7 @@ and Justin M. Lloyd.
 - R - Enable/Disable Missile Seeker
 - F - Deploy Flares
 - Space - Enable missile's engine (3 Sec burn time)
-- Left Shift - Lock target within gimbal limit
+- Left Shift - Find and lock seeker to target within gimbal limit
 - Left Arrow - Rotate counter-clockwise
 - Right Arrow - Rotate clockwise
 - M - Load fast missile level
@@ -35,6 +35,7 @@ and Justin M. Lloyd.
 - U - Unload level
 - L - Load level with spheres
 - T - Load level with moving plane
+- C - Load chase cam missile testing
   
   **<u>-- FEATURES --</u>**
 - Working basic missile simulation using proportional navigation with an engine and proxy fuse
