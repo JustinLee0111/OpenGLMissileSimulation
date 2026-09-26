@@ -36,6 +36,8 @@ void ParticleSystem::draw(World& world, float aspectRatio) const{
 		particleShader->setVec3("scale", particleBucket->scale);
 		for (int i = 0; i < particleBucket->particles.size(); i++) {
 			if (particleBucket->particles[i].active) {
+				particleShader->setBool("useColor", true);
+				particleShader->setVec4("color", particleBucket->particles[i].color);
 				particleShader->setVec3("position", particleBucket->particles[i].position);
 				particleBucket->getModel().drawOpaque();
 			}
@@ -44,6 +46,8 @@ void ParticleSystem::draw(World& world, float aspectRatio) const{
 	particleShader->setVec3("scale", world.flareBucket->scale);
 	for (int i = 0; i < world.flareBucket->particles.size(); i++) {
 		if (world.flareBucket->particles[i].active) {
+			particleShader->setBool("useColor", true);
+			particleShader->setVec4("color", world.flareBucket->particles[i].color);
 			particleShader->setVec3("position", world.flareBucket->particles[i].position);
 			world.flareBucket->model->drawOpaque();
 		}

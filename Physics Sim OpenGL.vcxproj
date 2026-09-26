@@ -197,6 +197,7 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <ClInclude Include="src\core\ParticleSystem.h" />
     <ClInclude Include="src\environment\FlareData.h" />
     <ClInclude Include="src\environment\Flares.h" />
+    <ClInclude Include="shaders\grid.vert" />
     <ClInclude Include="src\environment\ParticleBucket.h" />
     <ClInclude Include="src\environment\ParticleData.h" />
     <ClInclude Include="src\core\PhysicsEngine.h" />
@@ -220,6 +221,7 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <None Include="shaders\debug.frag" />
     <None Include="shaders\debug.vert" />
     <None Include="shaders\fragment.frag" />
+    <None Include="shaders\grid.frag" />
     <None Include="shaders\particles.frag" />
     <None Include="shaders\particles.vert" />
     <None Include="shaders\vertex.vert" />

@@ -15,14 +15,16 @@ World* Debugging::world = nullptr;
 float Debugging::aspectRatio{ 0.0f };
 float Debugging::currentConeAngle{ 0.0f };
 
-void Debugging::cone(float angle, float length, glm::vec3 position, glm::vec3 direction) {
+void Debugging::cone(float angle, float length, glm::vec3 position, glm::vec3 direction, glm::vec4 color) {
 	drawWrapper();
 
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
-	createCone(angle, length);
+	createCone(angle, length, color);
 	glm::quat orientation = glm::quatLookAt(glm::normalize(direction), glm::vec3{ 0.0f, 1.0f, 0.0f });
 	glm::mat4 matrix = glm::translate(glm::mat4(1.0f), position) * glm::mat4_cast(orientation);
+	debugShader->setBool("useColor", true);
+	debugShader->setVec4("color", color); // Sends object position and orientation to shader
 	debugShader->setMat4("model", matrix); // Sends object position and orientation to shader
 	debugCone->drawTransparent(); // Draws the model through all meshes being drawn
 	glDisable(GL_BLEND);
@@ -37,7 +39,7 @@ void Debugging::drawWrapper() {
 	debugShader->setMat4("projection", projection);
 }
 
-void Debugging::createCone(float angle, float length) {
+void Debugging::createCone(float angle, float length, glm::vec4 color) {
 	if (angle == currentConeAngle) {
 		return;
 	}
@@ -67,7 +69,6 @@ void Debugging::createCone(float angle, float length) {
 		indices.push_back(i + 1);
 		indices.push_back(i);
 	}
-	glm::vec4 color = glm::vec4{ 1.0f, 1.0f, 1.0f, 0.10f };
 	debugCone = AssetManager::loadModel("debugCone", vertices, indices, color);
 }
 

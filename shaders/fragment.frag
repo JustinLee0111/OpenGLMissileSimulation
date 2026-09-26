@@ -13,12 +13,17 @@ uniform vec3 lightPos;
 uniform float ambientLightStrength;
 uniform vec3 camPos;
 uniform bool lightingEnable;
+uniform vec4 color;
+uniform bool useColor;
 
 void main(){
 	if(!lightingEnable){
 		screenColor = fragmentColor;
 		return;
 	}
+
+	vec4 finalColor = (useColor) ? color : fragmentColor;
+
 	vec3 norm = normalize(normal); // Renormalizing the normal for redundancy/accuracy
 	vec3 vertexToCamNorm = normalize(camPos - curVertexPos); // Normalized vector from vertex -> cam
 	vec3 lightToVertexNorm = normalize(curVertexPos - lightPos); // Normalized vector from light source -> vertex
@@ -32,5 +37,5 @@ void main(){
 	// Diffuse lighting
 	float diffuseStrength = max(dot(-lightToVertexNorm, norm), 0.0f);
 
-	screenColor = vec4(fragmentColor) * lightColor * (diffuseStrength + ambientLightStrength + finalSpecular);
+	screenColor = finalColor * lightColor * (diffuseStrength + ambientLightStrength + finalSpecular);
 }

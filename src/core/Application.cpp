@@ -12,6 +12,7 @@ int Application::appInit() {
 	
 	mainWindow = glfwCreateWindow(getWidth(), getHeight(), "Missile Sim", nullptr, nullptr);
 	glfwMakeContextCurrent(Application::mainWindow);
+	glfwWindowHint(GLFW_SAMPLES, 4); // MSAA 4x sampling
 
 	glfwSwapInterval(1); // VSYNC on
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -19,7 +20,7 @@ int Application::appInit() {
 		return -1;
 	}
 
-	appRenderer.rendererInit();
+	appRenderer.rendererInit(windowWidth, windowHeight);
 	if (debugEnabled) {
 		debug.Init(&world, getAspectRatio());
 	}
@@ -28,10 +29,6 @@ int Application::appInit() {
 
 	glfwSetKeyCallback(mainWindow, key_callback); // Where to send key stroke information once detected
 	glfwSetFramebufferSizeCallback(mainWindow, window_resize); // Where to send window information once resize detected
-
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glEnable(GL_DEPTH_TEST);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	inputs.init(mainWindow); 
 
@@ -44,7 +41,7 @@ void Application::runApp(){
 	float lastFrame = (float)glfwGetTime();
 	const float fixedDeltaTime = PhysicsEngine::getPhysicsRate();
 	while (!glfwWindowShouldClose(Application::mainWindow)) {
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		glfwPollEvents();
 		processKeyBindings();
 		inputs.update(mainWindow);
@@ -64,25 +61,29 @@ void Application::runApp(){
 		world.update();
 
 		if (world.currentCamera) {
-			appRenderer.draw(world, getAspectRatio());
+			appRenderer.draw(world, windowWidth, windowHeight);
 			world.getParticleSystem().draw(world, getAspectRatio());
 		}
 		if (debugEnabled) {
 			debugging();
 		}
 		inputs.keysUpdate();
+
 		glfwSwapBuffers(mainWindow);
 	}
 }
 
 void Application::debugging() {
 	for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
-		Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front); // Gimbal limit visual
+		glm::vec4 gimbalColor = glm::vec4{ 1.0f, 1.0f, 1.0f, 0.05f };
+		Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front, gimbalColor); // Gimbal limit visual
 
-		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->getAeroForce())), missile->position, missile->getAeroForce()); // Aero force
+		glm::vec4 aeroColor = glm::vec4{ 0.0f, 0.0f, 1.0f, 0.1f };
+		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->getAeroForce())), missile->position, missile->getAeroForce(), aeroColor); // Aero force
 
+		glm::vec4 velocityColor = glm::vec4{ 0.0f, 1.0f, 0.0f, 0.1f };
 		glm::vec3 velocityDebug = (glm::length(missile->physicsProperties->velocity) > 0.0f) ? (missile->physicsProperties->velocity) : missile->front; 
-		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->physicsProperties->velocity)), missile->position, velocityDebug); // Velocity
+		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->physicsProperties->velocity)), missile->position, velocityDebug, velocityColor); // Velocity
 
 		if (!missile->getSeeker().getSeekerOn()) { continue; }
 		glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
@@ -105,16 +106,16 @@ void Application::processKeyBindings() {
 	if (!world.objects.empty()) {
 		glm::quat r = world.objects[0]->rotationQ;
 		if (inputs.isKeyPressed(GLFW_KEY_W)) {
-			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, 5.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, 10.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_A)) {
-			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 5.0f, 0.0f, 0.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 10.0f, 0.0f, 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_S)) {
-			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, -2.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, -10.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_D)) {
-			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ -2.0f, 0.0f, 0.0f };
+			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ -10.0f, 0.0f, 0.0f };
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
 			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, glm::pi<float>(), 0.0f};
@@ -155,7 +156,7 @@ void Application::processKeyBindings() {
 		}
 		if (world.objects.size() > 1) {
 			if (inputs.isKeyPressed(GLFW_KEY_F)) {
-				world.flareBucket->deployFlares(gen, world.objects[1]->position, -world.objects[1]->up, world.objects[1]->physicsProperties->velocity);
+				world.flareBucket->deployFlares(gen, world.objects[1]->position, -world.objects[1]->up);
 			}
 		}
 	}

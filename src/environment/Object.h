@@ -17,6 +17,7 @@ public:
 	glm::vec3 position{ 0.0f };
 	glm::quat rotationQ{ 1.0f, 0.0f, 0.0f, 0.0f };
 	glm::vec3 scale{ 1.0f };
+	glm::vec4 color{ 1.0f, 0.0f, 0.0f, 1.0f }; // Default red color
 
 	glm::vec3 left = rotationQ * glm::vec3{ -1.0f, 0.0f, 0.0f };
 	glm::vec3 front = rotationQ * glm::vec3{ 0.0f, 0.0f, 1.0f };

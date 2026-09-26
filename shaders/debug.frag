@@ -5,6 +5,10 @@ in vec4 fragmentColor;
 // Outputs colors in RGBA format
 out vec4 screenColor;
 
+uniform vec4 color;
+uniform bool useColor;
+
 void main(){
-	screenColor = vec4(fragmentColor);
+	vec4 finalColor = (useColor) ? color : fragmentColor;
+	screenColor = finalColor;
 }

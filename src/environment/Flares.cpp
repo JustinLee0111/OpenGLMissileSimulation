@@ -12,7 +12,7 @@ void Flares::spawnDirectionalParticle(std::mt19937& gen, glm::vec3 origin, glm::
 			float zRand = std::uniform_real_distribution<float>{ -velVariance, velVariance }(gen);
 
 			particle.position = origin;
-			particle.velocity = (direction + glm::vec3{ xRand, yRand, zRand }) * deploySpeed - initVel;
+			particle.velocity = (direction + glm::vec3{ xRand, yRand, zRand }) * deploySpeed + initVel;
 			particle.remainingTime = lifeTime;
 			particle.particleTemp.temperature = 1000.0f;
 			particle.active = true;

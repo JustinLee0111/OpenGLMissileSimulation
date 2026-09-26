@@ -45,6 +45,9 @@ void LevelManager::loadLevel(const std::string& filepath, World& world) {
 		if (object.contains("scale")) {
 			spawnedObject->scale = glm::vec3{ object["scale"][0], object["scale"][1], object["scale"][2] };
 		}
+		if (object.contains("color")) {
+			spawnedObject->color = glm::vec4{ object["color"][0], object["color"][1], object["color"][2], object["color"][3] };
+		}
 		if (object.contains("rotation")) {
 			auto rotation = object["rotation"];
 			auto axis = rotation["axis"];
