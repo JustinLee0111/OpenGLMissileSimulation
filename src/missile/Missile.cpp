@@ -57,7 +57,7 @@ void Missile::proNav(float deltaTime) { // Orients the missile using calculated 
 		
 		glm::vec3 finalAngularVelocity{ 0.0f };
 
-		if (flightPathMag >= 0.001f) {
+		if (flightPathMag >= 0.00001f) {
 			float vel = glm::length(physicsProperties->velocity);
 
 			// Makes the turn rate speed dependent, at the specified speed, the turn rate is at its peak
@@ -75,7 +75,7 @@ void Missile::proNav(float deltaTime) { // Orients the missile using calculated 
 		// Makes sure the seeker is always tracking even with sharp turns
 		glm::quat missileRotate = glm::angleAxis(glm::length(finalAngularVelocity * deltaTime), glm::normalize(finalAngularVelocity * deltaTime));
 		glm::vec3 projectedSeekerLook = (rotationQ * ( glm::conjugate(missileRotate) * seeker->seekerOrientation ) ) * glm::vec3{ 0.0f, 0.0f, 1.0f };
-		float projectedSeekerAngle = glm::acos(glm::clamp(glm::dot(projectedSeekerLook, front), -1.0f, 1.0f));
+		float projectedSeekerAngle = glm::acos(glm::clamp(glm::dot(projectedSeekerLook, front), 0.0f, 1.0f));
 
 		if (projectedSeekerAngle >= seeker->gimbalLimit / 2.0f) {
 			physicsProperties->angularVelocity = glm::vec3{ 0.0f }; // Don't make missile turn if seeker will lose visual on target

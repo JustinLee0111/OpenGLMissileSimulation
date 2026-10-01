@@ -38,7 +38,7 @@ void MissileSeeker::lateUpdate(const World& world, Missile& missile, float delta
 			angleFOV = spatialGatedFOV;
 			spatialGateDelayTimer = 0.0f;
 		}
-		else {
+		else if(angleFOV != spatialGatedFOV){
 			spatialGateDelayTimer += deltaTime;
 		}
 	}
@@ -95,7 +95,6 @@ void MissileSeeker::updateSeekerState() {
 		if (curState == SeekerState::Memory) { // If flare was detected, keep going off of memory with seeker off until timeout
 			if (timeSinceLock >= memoryTimeout) {
 				curState = SeekerState::MemoryRelock;
-				curSeekerData.tracking = false;
 				seekerEnabled = true;
 				timeSinceLock = 0.0f;
 			}
@@ -106,7 +105,6 @@ void MissileSeeker::updateSeekerState() {
 		}
 		else { // If seeker is turned off manually
 			curState = SeekerState::Off;
-			curSeekerData.tracking = false;
 		}
 	}
 }
@@ -148,7 +146,7 @@ void MissileSeeker::scanFOV(const World& world, Missile& missile, float deltaTim
 SeekerData MissileSeeker::scanObjects(const World& world, Missile& missile, float deltaTime) {
 	SeekerData scannedData;
 	glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
-	glm::vec3 worldLookDirection = (missile.rotationQ * seekerOrientation) * forward; // Convert local to world seeker look direction vector
+	glm::vec3 worldLookDirection = glm::normalize((missile.rotationQ * seekerOrientation) * forward); // Convert local to world seeker look direction vector
 
 	for (auto& obj : world.objects) {
 		if (obj->physicsProperties->collider != ColliderType::Sphere || obj.get() == &missile) continue; // Only tracking spheres
@@ -265,6 +263,7 @@ void MissileSeeker::findRandomTarget(World& world, Missile& missile){
 			// SEEKER ROTATION CALCULATIONS
 			missileToObj = glm::conjugate(missile.rotationQ) * glm::normalize(missileToObj); // Converts the target's coordinates to the missile's local space then the seeker's local space
 			seekerOrientation = glm::rotation(forward, missileToObj);
+			
 			curSeekerData.tracking = true;
 			return;
 		}
