@@ -2,6 +2,7 @@
 
 #include "core/Application.h"
 
+// Author: Justin Lee
 // Description: Working basic missile simulation combined with a custom physics simulator for bouncing sphere on sphere and sphere on bounded plane. Uses Continuous Collision Detection (CCD) to detect collisions.
 // Using proportional navigation to guide the missile.
 // The benefit of CCD is the ability to prevent high-speed tunneling (objects passing through one another) and calculating precise collisions.
@@ -40,6 +41,7 @@
 // L - Load level
 // T - Load level with moving plane
 // C - Load chase cam missile testing
+// X - Load side aspect scenario
 
 using namespace std;
 

@@ -104,8 +104,10 @@ void PhysicsEngine::positionUpdater(float hitTime) {
 		if (!object || !object->physicsProperties || object->physicsProperties->mass <= 0.0f || object->physicsProperties->isStatic) continue;
 		//glm::vec3 worldSpaceVel = object->rotationQ * object->physicsProperties->velocity;
 		glm::vec3 worldSpaceVel = object->physicsProperties->velocity;
-		if (object->physicsProperties->enableGravity) {
-			object->position += worldSpaceVel * hitTime + 0.5f * gravity * hitTime * hitTime;
+		glm::vec3 acceleration = (object->physicsProperties->totalForces / object->physicsProperties->mass);
+		float forcesMag = glm::length(object->physicsProperties->totalForces);
+		if (forcesMag > 0.0f) {
+			object->position += worldSpaceVel * hitTime + 0.5f * acceleration * hitTime * hitTime;
 		}
 		else {
 			object->position += worldSpaceVel * hitTime;

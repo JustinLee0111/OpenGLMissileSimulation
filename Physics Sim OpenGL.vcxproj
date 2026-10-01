@@ -218,6 +218,7 @@ glfw3.lib;user32.lib;gdi32.lib;shell32.lib;assimp-vc145-mt.lib</AdditionalDepend
     <ClInclude Include="src\staticHeaders.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\blur.frag" />
     <None Include="shaders\debug.frag" />
     <None Include="shaders\debug.vert" />
     <None Include="shaders\fragment.frag" />

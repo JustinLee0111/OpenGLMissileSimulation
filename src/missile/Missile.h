@@ -13,6 +13,8 @@ class Missile : public Object {
 		Missile() = default;
 		~Missile() = default;
 		void update(World& world, float deltaTime);
+		void earlyUpdate(World& world, float deltaTime);
+		void lateUpdate(World& world, float deltaTime);
 
 		const MissileSeeker getSeeker() const{
 			return *seeker;
@@ -46,19 +48,21 @@ class Missile : public Object {
 		std::unique_ptr<MissileSeeker> seeker = std::make_unique<MissileSeeker>();
 		ParticleBucket* smokeParticles = nullptr; // Breaks responsibility ownership with world but didn't want to search bucket everytime for smoke
 
-		float proNavGain{ 4.0f }; // Gain for how aggressive the missile gets on optimal flight path, higher = more aggressive turning earlier
+		float proNavGain{ 3.5f }; // Gain for how aggressive the missile gets on optimal flight path, higher = more aggressive turning earlier
 		float maxAngVel{ glm::pi<float>() }; // Radians per second
 
 		float engineBurnTime{ 5.0f }; // Burn time in seconds
 		float burnTimeRemaining{ engineBurnTime };
 
-		float wingSurfaceArea{ 0.25f }; // In m^2
+		float wingSurfaceArea{ 0.15f }; // In m^2
 		float wingFrontSurfaceArea{ 0.025f }; // Frontal surface area for drag calculations, also in m^2
 		float speedMaxTurn{ 400.0f }; // The speed at which the missile has the best turn rate
 
 		float proxyTrigDist{ 5.0f }; // Distance from edge of missile to target edge for triggering proxy fuse
 		float explosionDamage{ 100.0f };
 		float explosionRadius{ 5.0f };
+
+		bool memoryTurnDamping{ false }; // Slows turn rate during memory flight
 
 		glm::vec3 aeroForce{ 0.0f }; // Aero force in newtons
 		glm::vec3 engineThrust{0.0f, 0.0f, 150.0f}; // Thrust in newtons

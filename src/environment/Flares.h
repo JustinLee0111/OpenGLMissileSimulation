@@ -39,5 +39,7 @@ class Flares{
 		float burstDeployGap{ 0.25f }; // Gap between deployment of burst flares
 		int burstCount{ 4 }; // How many sets of flares to drop per burst
 
+		FlareData* latestFlare = nullptr;
+
 		std::shared_ptr<Model> model = nullptr;
 };

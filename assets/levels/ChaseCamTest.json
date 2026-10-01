@@ -5,8 +5,8 @@
       "cameraName": "chaseCamera",
       "chase": true,
       "position": [ -251.0, -24.0, 0.0 ],
-      "yaw": -90.0,
-      "pitch": 0.0
+      "yaw": -85.0,
+      "pitch": 15.0
     },
     {
       "cameraName": "mainCamera",
@@ -21,8 +21,8 @@
       "objectName": "missile",
       "modelPath": "assets/models/sphere.obj",
       "gravity": true,
-      "position": [ -50.0, -50.0, 0.0 ],
-      "velocity": [ 0.0, 0.0, 100.0 ],
+      "position": [ -50.0, 5.0, 0.0 ],
+      "velocity": [ 0.0, 0.0, 150.0 ],
       "scale": [ 0.25, 0.25, 1.0 ],
       "collider": "Sphere",
       "restitution": 0.5,
@@ -37,7 +37,7 @@
       "velocity": [ -100.0, 0.0, 0.0 ],
       "gravity": false,
       "isStatic" : false,
-      "position": [ 300.0, 30.0, 0.0 ],
+      "position": [ 300.0, 85.0, 0.0 ],
       "collider": "Sphere",
       "restitution": 0.5
     }

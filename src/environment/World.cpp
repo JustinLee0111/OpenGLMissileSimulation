@@ -117,6 +117,9 @@ Light* World::createLight(glm::vec3 lightPos, glm::vec4 lightColor) {
 }
 
 void World::fixedUpdate(std::mt19937& gen){
+	for (auto& missile : missiles) {
+		missile->earlyUpdate(*this, physicsEngine.getPhysicsRate());
+	}
 	if (!objects.empty()) {
 		physicsEngine.update();
 	}
@@ -147,11 +150,20 @@ void World::fixedUpdate(std::mt19937& gen){
 	for (auto& particleBucket : particleBuckets) {
 		particleSystem.updateParticles(gen, *this, physicsEngine.getPhysicsRate());
 	}
+	//if (flareBucket->latestFlare) {
+	//	std::cout << "Flare Temp: " << flareBucket->latestFlare->particleTemp.temperature << std::endl;
+	//}
 }
 
 void World::update() {
 	if (currentCamera->chaseObject && currentCamera && currentCamera->chase) {
 		currentCamera->cameraChaseUpdate();
+	}
+}
+
+void World::lateUpdate() {
+	for (auto& missile : missiles) {
+		missile->lateUpdate(*this, physicsEngine.getPhysicsRate());
 	}
 }
 

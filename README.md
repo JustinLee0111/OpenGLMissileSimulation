@@ -21,24 +21,29 @@ and Justin M. Lloyd.
 - 2 - Camera 2 (If it exists in level)
 - W - Add forward velocity to missile
 - A - Add left velocity to missile
-- S - Add back velocity to missile
+- S - Add backwards velocity to missile
 - D - Add right velocity to missile
 - R - Enable/Disable Missile Seeker
 - F - Deploy Flares
-- Space - Enable missile's engine (3 Sec burn time)
+- Space - Enable missile's engine (5 Sec burn time)
 - Left Shift - Find and lock seeker to target within gimbal limit
 - Left Arrow - Rotate counter-clockwise
 - Right Arrow - Rotate clockwise
 - M - Load fast missile level
 - N - Load slow missile level
 - B - Load alternate slow missile level
+- V - Load a scenario with missile at standstill
+- C - Load chase cam missile testing
+- X - Load side aspect scenario
 - U - Unload level
 - L - Load level with spheres
 - T - Load level with moving plane
-- C - Load chase cam missile testing
   
   **<u>-- FEATURES --</u>**
-- Working basic missile simulation using proportional navigation with an engine and proxy fuse
+- Working missile simulation using proportional navigation with an engine and proxy fuse
+- Infrared Counter Counter Measures (IRCCM) utilizing Two-color, Spatial Gating, and Memory
+- Flares for targets
+- AoA Limiter
 - Continuous Collision Detection solver with both conservative advancement and analytical Time of Impact (TOI) solver
 - Bounded plane collisions with dynamic normals for edge collisions (only for sphere and plane collisions)
 - Working particle system for missile and explosion
@@ -48,7 +53,7 @@ and Justin M. Lloyd.
 
 **<u>Currently:</u>**
 
-Basic missile simulation and sphere physics simulator
+Missile simulation with IRCCM and flares. Includes a CCD sphere and bounded plane physics simulator.
 
 **<u>Endgoal:</u>**
 

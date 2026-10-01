@@ -10,8 +10,6 @@ void Missile::update(World& world, float deltaTime) {
 	}
 	updateAeroForce(world.airDensity, deltaTime);
 	physicsProperties->addForce(aeroForce);
-	seeker->update(world, *this, deltaTime);
-	proNav(deltaTime);
 	if (engineOn && burnTimeRemaining > 0.0f) { // While engine is on and has fuel remaining, emit smoke trail and add thrust
 		smokeParticles->emitParticles(this, -front);
 		physicsProperties->addForce(rotationQ * engineThrust);
@@ -28,8 +26,28 @@ void Missile::update(World& world, float deltaTime) {
 		seeker->resetSeekerData();
 		physicsProperties->angularVelocity = glm::vec3{ 0.0f };
 	}
-	std::cout << "Forward Vel: " << (glm::conjugate(rotationQ) * physicsProperties->velocity).z << std::endl; // Prints the forward velocity of the missile for debugging
-	std::cout << "GForce: " << (glm::length(physicsProperties->angularVelocity) * glm::length(physicsProperties->velocity)) / 9.81f << std::endl;
+
+	// Damps turn rate during memory flight to help reaquire target after memory flight
+	if (seeker->getMemoryFlight() && !memoryTurnDamping && seeker->curState != SeekerState::MemoryRelock) {
+		physicsProperties->angularVelocity /= 2.0f;
+		memoryTurnDamping = true;
+	}
+	else if (!seeker->getMemoryFlight()) {
+		memoryTurnDamping = false;
+	}
+
+	std::cout << "Forward Vel: " << (glm::conjugate(rotationQ) * physicsProperties->velocity).z << std::endl;
+	//std::cout << "GForce: " << (glm::length(physicsProperties->angularVelocity) * glm::length(physicsProperties->velocity)) / 9.81f << std::endl;
+}
+
+void Missile::earlyUpdate(World& world, float deltaTime) {
+	seeker->update(world, *this, deltaTime);
+}
+
+void Missile::lateUpdate(World& world, float deltaTime) {
+	seeker->updateScanData(*this, deltaTime);
+	seeker->lateUpdate(world, *this, deltaTime);
+	proNav(deltaTime);
 }
 
 void Missile::proNav(float deltaTime) { // Orients the missile using calculated proportional navigation to intercept the target
@@ -39,7 +57,7 @@ void Missile::proNav(float deltaTime) { // Orients the missile using calculated 
 		
 		glm::vec3 finalAngularVelocity{ 0.0f };
 
-		if (flightPathMag >= 0.00001f) {
+		if (flightPathMag >= 0.001f) {
 			float vel = glm::length(physicsProperties->velocity);
 
 			// Makes the turn rate speed dependent, at the specified speed, the turn rate is at its peak
@@ -53,6 +71,7 @@ void Missile::proNav(float deltaTime) { // Orients the missile using calculated 
 				finalAngularVelocity = flightPathRate * speedTurnCap;
 			}
 		}
+		physicsProperties->angularVelocity = finalAngularVelocity;
 		// Makes sure the seeker is always tracking even with sharp turns
 		glm::quat missileRotate = glm::angleAxis(glm::length(finalAngularVelocity * deltaTime), glm::normalize(finalAngularVelocity * deltaTime));
 		glm::vec3 projectedSeekerLook = (rotationQ * ( glm::conjugate(missileRotate) * seeker->seekerOrientation ) ) * glm::vec3{ 0.0f, 0.0f, 1.0f };
@@ -116,7 +135,7 @@ bool Missile::proximityFuseTrig(World& world){
 	for (auto& obj : world.objects) {
 		if (!obj || obj->physicsProperties->collider != ColliderType::Sphere || obj.get() == this) { continue; }
 		glm::vec3 missileToObject = obj->position - position;
-		float speedSlop = glm::length(physicsProperties->velocity) / 100.0f; // To prevent tunneling of proxy fuse check
+		float speedSlop = glm::length(physicsProperties->velocity) / 50.0f; // To prevent tunneling of proxy fuse check
 		float dist = (glm::length(missileToObject) - obj->physicsProperties->radius - physicsProperties->radius);
 		if (dist > proxyTrigDist + speedSlop) { continue; }
 		else {

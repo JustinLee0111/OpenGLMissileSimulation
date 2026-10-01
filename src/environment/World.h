@@ -73,6 +73,7 @@ public:
 
 	void fixedUpdate(std::mt19937& gen);
 	void update();
+	void lateUpdate();
 
 	void updateParticles(float deltaTime);
 

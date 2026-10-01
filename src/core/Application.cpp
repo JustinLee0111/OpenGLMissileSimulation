@@ -55,6 +55,7 @@ void Application::runApp(){
 		// Ensures physics simulation does fixed time steps regardless of fps
 		while (accumulator >= fixedDeltaTime) {
 			world.fixedUpdate(gen);
+			world.lateUpdate();
 			accumulator -= fixedDeltaTime;
 		}
 
@@ -105,6 +106,14 @@ void Application::processKeyBindings() {
 
 	if (!world.objects.empty()) {
 		glm::quat r = world.objects[0]->rotationQ;
+		glm::quat r2{ 1.0f, 0.0f, 0.0f, 0.0f };
+		if (world.objects.size() > 1) {
+			 r2 = world.objects[1]->rotationQ;
+			if (inputs.isKeyPressed(GLFW_KEY_F)) {
+				glm::vec3 deployPos = world.objects[1]->position + world.objects[1]->rotationQ * glm::vec3{ 0.0f, -2.5f, 0.0f};
+				world.flareBucket->deployFlares(gen, deployPos, -world.objects[1]->up);
+			}
+		}
 		if (inputs.isKeyPressed(GLFW_KEY_W)) {
 			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ 0.0f, 0.0f, 10.0f };
 		}
@@ -116,6 +125,18 @@ void Application::processKeyBindings() {
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_D)) {
 			world.objects[0]->physicsProperties->velocity += r * glm::vec3{ -10.0f, 0.0f, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_Y)) {
+			world.objects[1]->physicsProperties->addForce(r2 * glm::vec3{ 0.0f, 1000.0f, 0.0f });
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_H)) {
+			world.objects[1]->physicsProperties->addForce(r2 * glm::vec3{ 0.0f, -1000.0f, 0.0f });
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_G)) {
+			world.objects[1]->physicsProperties->addForce(r2 * glm::vec3{ 1000.0f, 0.0f, 0.0f });
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_J)) {
+			world.objects[1]->physicsProperties->addForce(r2 * glm::vec3{ -1000.0f, 0.0f, 0.0f });
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
 			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, glm::pi<float>(), 0.0f};
@@ -154,11 +175,6 @@ void Application::processKeyBindings() {
 				world.currentCamera = world.cameras[1].get();
 			}
 		}
-		if (world.objects.size() > 1) {
-			if (inputs.isKeyPressed(GLFW_KEY_F)) {
-				world.flareBucket->deployFlares(gen, world.objects[1]->position, -world.objects[1]->up);
-			}
-		}
 	}
 
 	if (inputs.isKeyPressed(GLFW_KEY_U)) {
@@ -192,6 +208,10 @@ void Application::processKeyBindings() {
 	if (inputs.isKeyPressed(GLFW_KEY_C)) {
 		world.unloadLevel();
 		world.loadLevel("assets/levels/ChaseCamTest.json");
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_X)) {
+		world.unloadLevel();
+		world.loadLevel("assets/levels/SideAspect.json");
 	}
 }
 

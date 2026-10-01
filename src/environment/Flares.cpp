@@ -16,6 +16,7 @@ void Flares::spawnDirectionalParticle(std::mt19937& gen, glm::vec3 origin, glm::
 			particle.remainingTime = lifeTime;
 			particle.particleTemp.temperature = 1000.0f;
 			particle.active = true;
+			latestFlare = &particle;
 			break;
 		}
 	}
