@@ -1,8 +1,12 @@
 #include <iostream>
 #include <glad/glad.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui_impl_glfw.h>
 
 #include "core/Application.h"
 #include "missile/MissileSeeker.h"
+#include "imgui/missile_hud.h"
 
 int Application::appInit() {
 	if (!glfwInit()) {
@@ -34,6 +38,17 @@ int Application::appInit() {
 
 	world.worldInit();
 
+	// Setup Dear ImGui context
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.ScaleAllSizes(2.0f);
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplGlfw_InitForOpenGL(mainWindow, true);          // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
+	ImGui_ImplOpenGL3_Init();
+
 	return 0;
 }
 
@@ -43,6 +58,14 @@ void Application::runApp(){
 	while (!glfwWindowShouldClose(Application::mainWindow)) {
 
 		glfwPollEvents();
+
+		// Start the Dear ImGui frame
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+		//ImGui::ShowDemoWindow(); // Show demo window! :)
+		MissileHud::MissileHUD(world.missiles);	
+
 		processKeyBindings();
 		inputs.update(mainWindow);
 		float currentFrame = (float)glfwGetTime();
@@ -70,8 +93,15 @@ void Application::runApp(){
 		}
 		inputs.keysUpdate();
 
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 		glfwSwapBuffers(mainWindow);
 	}
+
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void Application::debugging() {

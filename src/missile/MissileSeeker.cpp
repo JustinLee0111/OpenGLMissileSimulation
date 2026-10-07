@@ -105,6 +105,7 @@ void MissileSeeker::updateSeekerState() {
 		}
 		else { // If seeker is turned off manually
 			curState = SeekerState::Off;
+			curSeekerData.tracking = false;
 		}
 	}
 }

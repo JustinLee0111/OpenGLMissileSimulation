@@ -35,9 +35,6 @@ void Missile::update(World& world, float deltaTime) {
 	else if (!seeker->getMemoryFlight()) {
 		memoryTurnDamping = false;
 	}
-
-	std::cout << "Forward Vel: " << (glm::conjugate(rotationQ) * physicsProperties->velocity).z << std::endl;
-	//std::cout << "GForce: " << (glm::length(physicsProperties->angularVelocity) * glm::length(physicsProperties->velocity)) / 9.81f << std::endl;
 }
 
 void Missile::earlyUpdate(World& world, float deltaTime) {

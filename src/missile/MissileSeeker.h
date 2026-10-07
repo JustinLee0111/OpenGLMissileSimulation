@@ -91,6 +91,14 @@ public:
 		return seekerEnabled;
 	}
 
+	const bool getIsTracking() const{
+		return curSeekerData.tracking;
+	}
+
+	const SeekerData getSeekerData() const{
+		return curSeekerData;
+	}
+
 	bool seekerEnabled = true;
 private:
 	// Infrared Counter Counter Measure (IRCCM) bools
