@@ -33,6 +33,8 @@ void MissileHud::MissileHUD(std::vector<Missile*>& missiles)
         if (!missiles.empty()) {
             ImGui::Text("Speed: %.1f m/s", glm::length(missiles[0]->physicsProperties->velocity));
             ImGui::Text("GForce: %.1f G", (glm::length(missiles[0]->physicsProperties->angularVelocity) * glm::length(missiles[0]->physicsProperties->velocity)) / 9.81f);
+            ImGui::Text("Angle of Attack (deg): %.1f", glm::degrees(missiles[0]->getAOA()));
+            ImGui::Text("Fuel Remaining (sec): %.1f", missiles[0]->getFuelTimeLeft());
             if (missiles[0]->engineOn) {
                 ImGui::Text("Engine: On");
             }
@@ -45,7 +47,9 @@ void MissileHud::MissileHUD(std::vector<Missile*>& missiles)
             else {
                 ImGui::Text("Seeker: Not Tracking");
             }
-            //std::cout << "GForce: " << (glm::length(physicsProperties->angularVelocity) * glm::length(physicsProperties->velocity)) / 9.81f << std::endl;
+            if (ImGui::Button("Reset Fuel")) {
+                missiles[0]->resetFuel();
+            }
         }
         else {
             ImGui::Text("No Missile!");

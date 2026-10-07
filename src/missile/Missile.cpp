@@ -97,6 +97,7 @@ void Missile::updateAeroForce(float airDensity, float deltaTime) {
 		return;
 	}
 	float angleOfAttack = glm::acos(glm::clamp(glm::dot(front, normVel), -1.0f, 1.0f));
+	missileAOA = angleOfAttack;
 
 	// Once velocity exceeds 1000, it starts limiting AOA to reduce excessive forces
 	// Fixes exponential lift and drag force gain at extremely high speeds

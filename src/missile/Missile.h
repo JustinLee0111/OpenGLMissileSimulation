@@ -42,6 +42,18 @@ class Missile : public Object {
 
 		void findRandomTarget(World& world);
 
+		const float getAOA() const{
+			return missileAOA;
+		}
+
+		const float getFuelTimeLeft() const {
+			return burnTimeRemaining;
+		}
+
+		void resetFuel() {
+			burnTimeRemaining = engineBurnTime;
+		}
+
 		bool engineOn = false;
 
 	private:
@@ -66,4 +78,7 @@ class Missile : public Object {
 
 		glm::vec3 aeroForce{ 0.0f }; // Aero force in newtons
 		glm::vec3 engineThrust{0.0f, 0.0f, 150.0f}; // Thrust in newtons
+
+		// Variables for debugging/HUD
+		float missileAOA{ 0.0f };
 };
