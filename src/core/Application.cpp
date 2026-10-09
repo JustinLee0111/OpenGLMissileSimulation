@@ -1,3 +1,5 @@
+#define GLFW_INCLUDE_NONE
+
 #include <iostream>
 #include <glad/glad.h>
 #include <imgui/imgui.h>
@@ -6,7 +8,12 @@
 
 #include "core/Application.h"
 #include "missile/MissileSeeker.h"
+#include "imgui/app_hud.h"
 #include "imgui/missile_hud.h"
+#include "core/LevelManager.h"
+
+int Application::windowWidth = 1920;
+int Application::windowHeight = 1440;
 
 int Application::appInit() {
 	if (!glfwInit()) {
@@ -26,7 +33,7 @@ int Application::appInit() {
 
 	appRenderer.rendererInit(windowWidth, windowHeight);
 	if (debugEnabled) {
-		debug.Init(&world, getAspectRatio());
+		debug.Init(&world);
 	}
 
 	glfwSetWindowUserPointer(mainWindow, this); // Sets this window context to the user pointer, can be retreived to pass window context to functions
@@ -56,7 +63,6 @@ void Application::runApp(){
 	float lastFrame = (float)glfwGetTime();
 	const float fixedDeltaTime = PhysicsEngine::getPhysicsRate();
 	while (!glfwWindowShouldClose(Application::mainWindow)) {
-
 		glfwPollEvents();
 
 		// Start the Dear ImGui frame
@@ -65,11 +71,11 @@ void Application::runApp(){
 		ImGui::NewFrame();
 		//ImGui::ShowDemoWindow(); // Show demo window! :)
 		MissileHud::MissileHUD(world.missiles);	
+		AppHUD::ShowAppHUD(*this, world);
 
-		processKeyBindings();
 		inputs.update(mainWindow);
 		float currentFrame = (float)glfwGetTime();
-		float frameTime = currentFrame - lastFrame;
+		frameTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
 		// Extreme low fps frametime clamp
@@ -87,15 +93,14 @@ void Application::runApp(){
 		if (world.currentCamera) {
 			appRenderer.draw(world, windowWidth, windowHeight);
 			world.getParticleSystem().draw(world, getAspectRatio());
-		}
-		if (debugEnabled) {
-			debugging();
+			if (debugEnabled) {
+				debugging();
+			}
 		}
 		inputs.keysUpdate();
 
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 		glfwSwapBuffers(mainWindow);
 	}
 
@@ -105,6 +110,7 @@ void Application::runApp(){
 }
 
 void Application::debugging() {
+	Debugging::drawWrapper(getAspectRatio());
 	for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
 		glm::vec4 gimbalColor = glm::vec4{ 1.0f, 1.0f, 1.0f, 0.05f };
 		Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front, gimbalColor); // Gimbal limit visual
@@ -163,16 +169,22 @@ void Application::processKeyBindings() {
 			world.objects[1]->physicsProperties->addForce(r2 * glm::vec3{ 0.0f, -1000.0f, 0.0f });
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_G)) {
-			world.objects[1]->physicsProperties->addForce(r2 * glm::vec3{ 1000.0f, 0.0f, 0.0f });
+			world.objects[1]->physicsProperties->addForce(r2 * glm::vec3{ 0.0f, 0.0f, 1000.0f });
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_J)) {
-			world.objects[1]->physicsProperties->addForce(r2 * glm::vec3{ -1000.0f, 0.0f, 0.0f });
+			world.objects[1]->physicsProperties->addForce(r2 * glm::vec3{ 0.0f, 0.0f, -1000.0f });
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_RIGHT)) {
-			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, glm::pi<float>(), 0.0f};
+			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 0.0f, glm::pi<float>() * 2, 0.0f};
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_LEFT)) {
-			world.objects[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, glm::pi<float>(), 0.0f };
+			world.objects[0]->physicsProperties->angularVelocity += glm::vec3{ 0.0f, glm::pi<float>() * 2, 0.0f };
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_UP)) {
+			world.objects[0]->physicsProperties->angularVelocity -= glm::vec3{ 1.0f, 0.0f, 0.0f } * 5.0f;
+		}
+		if (inputs.isKeyPressed(GLFW_KEY_DOWN)) {
+			world.objects[0]->physicsProperties->angularVelocity += glm::vec3{ 1.0f, 0.0f, 0.0f } * 5.0f;
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_KP_8)) {
 			world.objects[0]->position += glm::vec3{ 0.0f, 1.0f, 0.0f };
@@ -206,48 +218,43 @@ void Application::processKeyBindings() {
 			}
 		}
 	}
-
 	if (inputs.isKeyPressed(GLFW_KEY_U)) {
-		world.unloadLevel();
+		LevelManager::unloadLevel(world);
 		inputs.mouseCameraControl = false;
 	}
+
+	// Level loading keybinds
 	if (inputs.isKeyPressed(GLFW_KEY_L)) {
-		world.unloadLevel();
-		world.loadLevel("assets/levels/PhysicsSimWorldData.json");
+		world.loadLevel(6);
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_T)) {
-		world.unloadLevel();
-		world.loadLevel("assets/levels/PhysicsTesting.json");
+		world.loadLevel(7);
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_M)) {
-		world.unloadLevel();
-		world.loadLevel("assets/levels/MissileSim.json");
+		world.loadLevel(0);
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_N)) {
-		world.unloadLevel();
-		world.loadLevel("assets/levels/MissileSimSlow.json");
+		world.loadLevel(1);
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_B)) {
-		world.unloadLevel();
-		world.loadLevel("assets/levels/MissileSimSlowAlt.json");
+		world.loadLevel(2);
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_V)) {
-		world.unloadLevel();
-		world.loadLevel("assets/levels/MissileSimStill.json");
+		world.loadLevel(3);
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_C)) {
-		world.unloadLevel();
-		world.loadLevel("assets/levels/ChaseCamTest.json");
+		world.loadLevel(5);
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_X)) {
-		world.unloadLevel();
-		world.loadLevel("assets/levels/SideAspect.json");
+		world.loadLevel(4);
 	}
 }
 
 void Application::window_resize(GLFWwindow* window, int width, int height) { // Triggers if glfw detects a window resize via glfwPollEvents()
 	Application* app = static_cast<Application*>(glfwGetWindowUserPointer(window)); // Very useful to pass window contexts to static functions
 	app->inputs.windowResize(width, height);
+	glfwGetWindowSize(window, &windowWidth, &windowHeight);
+	glViewport(0, 0, width, height);
 }
 
 void Application::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) { // Triggers if glfw detects a key stroke
@@ -256,4 +263,5 @@ void Application::key_callback(GLFWwindow* window, int key, int scancode, int ac
 		if (action == GLFW_PRESS) { app->inputs.currentKeys[key] = true; }
 		if (action == GLFW_RELEASE) { app->inputs.currentKeys[key] = false; }
 	}
+	app->processKeyBindings();
 }

@@ -5,6 +5,7 @@
 #include "rendering/Model.h"
 
 #include <glad/glad.h>
+#include <iostream>
 
 // Currently only for one camera
 void Renderer::draw(const World& world, float windowWidth, float windowHeight){
@@ -28,6 +29,7 @@ void Renderer::draw(const World& world, float windowWidth, float windowHeight){
 
 	// Draws opaque objects first
 	glDepthMask(GL_TRUE);
+	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 
 	shader->setBool("lightingEnable", true);
@@ -44,6 +46,7 @@ void Renderer::draw(const World& world, float windowWidth, float windowHeight){
 	// Draws transparent objects
 	glEnable(GL_BLEND);
 	glDepthMask(GL_FALSE);
+	glDisable(GL_CULL_FACE);
 
 	shader->setBool("lightingEnable", false);
 	for (const auto& obj : world.objects) {
@@ -73,6 +76,7 @@ void Renderer::rendererInit(float windowWidth, float windowHeight) {
 
 	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
+	glCullFace(GL_BACK);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 

@@ -38,7 +38,7 @@ public:
 
 	void rotate(glm::vec3 axis, float angle) {
 		glm::quat q = glm::angleAxis(glm::radians(angle), glm::normalize(axis));
-		rotationQ *= q;
+		rotationQ = q * rotationQ;
 	}
 	void setRotation(glm::vec3 axis, float angle) {
 		rotationQ = glm::angleAxis(glm::radians(angle), glm::normalize(axis));

@@ -26,6 +26,7 @@ class Application {
 
 		int getWidth() const { return windowWidth; }
 		int getHeight() const { return windowHeight; }
+		const float getFrametime() const { return frameTime; }
 		float getAspectRatio() const {
 			return static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 		}
@@ -36,14 +37,15 @@ class Application {
 		int appInit();
 		void runApp();
 	private:
-		GLFWwindow* mainWindow = nullptr;
+		GLFWwindow* mainWindow{ nullptr };
 		World world;
 		Debugging debug;
 		Renderer appRenderer;
 		InputHandler inputs;
-		int windowWidth = 1920;
-		int windowHeight = 1440;
-		float accumulator = 0.0f;
-		bool debugEnabled = true;
+		static int windowWidth;
+		static int windowHeight;
+		float frameTime{ 0.0f };
+		float accumulator{ 0.0f };
+		bool debugEnabled{ true };
 		std::mt19937 gen{ (unsigned int)std::time(0) };
 };

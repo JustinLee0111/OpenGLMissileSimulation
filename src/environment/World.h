@@ -66,10 +66,17 @@ public:
 		return worldLightSettings.ambientLightStrength;
 	}
 
+	void clearPhysObj() {
+		physicsEngine.physObjects.clear();
+	}
+
 	ParticleBucket* getParticleBucket(std::string bucketName);
 
-	void loadLevel(const std::string& filepath);
-	void unloadLevel();
+	void loadLevel(int levelIndex);
+	void clearParticleSystem() {
+		particleSystem.stopEmitting(particleBuckets);
+		particleSystem.clearEmittingObjs(particleBuckets);
+	}
 
 	void fixedUpdate(std::mt19937& gen);
 	void update();

@@ -115,7 +115,7 @@ void Missile::updateAeroForce(float airDensity, float deltaTime) {
 	glm::vec3 liftDir{ 0.0f };
 
 	// Sets the direction of the lift direction to be perpendicular to missile body
-	if (glm::dot(normVel, front) > 0.0f) {
+	if (angleOfAttack > 0.00001f) {
 		rotateAxis = glm::normalize(glm::cross(normVel, front));
 		liftDir = glm::normalize(glm::cross(rotateAxis, front));
 	}
@@ -124,8 +124,6 @@ void Missile::updateAeroForce(float airDensity, float deltaTime) {
 	glm::vec3 drag = -normVel * (dragCoeff * division * wingFrontSurfaceArea);
 
 	//std::cout << "AOA: " << angleOfAttack << std::endl;
-	//std::cout << "Lift Force: " << glm::length(lift) << std::endl;
-	//std::cout << "Drag Force: " << glm::length(drag) << std::endl;
 	aeroForce = lift + drag;
 }
 

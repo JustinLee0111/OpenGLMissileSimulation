@@ -29,7 +29,7 @@ class Camera {
 		void cameraChaseUpdate();
 
 		bool chase = false;
-		float orbitDistance = 50.0f;
+		float orbitDistance = 25.0f;
 
 		Object* chaseObject = nullptr;
 };

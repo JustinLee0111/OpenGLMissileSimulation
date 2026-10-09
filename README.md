@@ -1,4 +1,4 @@
-![description](assets/images/demov2.png)
+![description](assets/images/demov3.png)
 
 <h2  style="margin-bottom: 0px;">OpenGL Missile Simulation</h2>
 

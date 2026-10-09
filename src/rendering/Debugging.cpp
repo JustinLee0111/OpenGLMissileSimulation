@@ -12,12 +12,9 @@
 std::unique_ptr<Shader> Debugging::debugShader = nullptr;
 std::shared_ptr<Model> Debugging::debugCone = nullptr;
 World* Debugging::world = nullptr;
-float Debugging::aspectRatio{ 0.0f };
 float Debugging::currentConeAngle{ 0.0f };
 
 void Debugging::cone(float angle, float length, glm::vec3 position, glm::vec3 direction, glm::vec4 color) {
-	drawWrapper();
-
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	createCone(angle, length, color);
@@ -31,7 +28,7 @@ void Debugging::cone(float angle, float length, glm::vec3 position, glm::vec3 di
 	glDepthMask(GL_TRUE);
 }
 
-void Debugging::drawWrapper() {
+void Debugging::drawWrapper(float aspectRatio) {
 	debugShader->use();
 	const glm::mat4 view = world->currentCamera->getViewMatrix();
 	const glm::mat4 projection = world->currentCamera->getProjectionMatrix(aspectRatio);
@@ -72,9 +69,8 @@ void Debugging::createCone(float angle, float length, glm::vec4 color) {
 	debugCone = AssetManager::loadModel("debugCone", vertices, indices, color);
 }
 
-void Debugging::Init(World* world, float aspectRatio) {
+void Debugging::Init(World* world) {
 	this->world = world;
-	this->aspectRatio = aspectRatio;
 	debugShader = std::make_unique<Shader>("shaders/debug.vert", "shaders/debug.frag");
 	debugShader->use();
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

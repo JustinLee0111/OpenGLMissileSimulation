@@ -7,14 +7,25 @@
 #include "environment/camera.h"
 #include "environment/Object.h"
 #include "environment/PhysicsData.h"
+#include "core/AssetManager.h"
 
 // Dynamic level loading using JSON level data
-void LevelManager::loadLevel(const std::string& filepath, World& world) {
-	std::ifstream file(filepath);
-	if (!file.is_open()) {
-		throw std::runtime_error("Invalid file. Check file path: " + filepath);
+// return meaning, -1 = failed to open file, 0 = success loading level, 1 = already loaded level
+int LevelManager::loadLevel(const int levelIndex, World& world) {
+	std::string filePath;
+	for (auto& it : levelMap) {
+		if (it.first == levelIndex) {
+			filePath = it.second;
+			currentLevel = it.first;
+			unloadLevel(world);
+			break;
+		}
 	}
-
+	std::ifstream file(filePath);
+	if (!file.is_open()) {
+		std::cout << ("Invalid file. Check file path: " + filePath) << std::endl;
+		return -1;
+	}
 	nlohmann::json levelData;
 	file >> levelData;
 	for (auto object : levelData["objects"]) {
@@ -78,6 +89,23 @@ void LevelManager::loadLevel(const std::string& filepath, World& world) {
 		tempCamera->cameraRotate(yaw, pitch);
 		if (camera.contains("chase")) {
 			tempCamera->chase = camera["chase"];
+		}
+	}
+	reloadLevel = false;
+	return 0;
+}
+
+void LevelManager::unloadLevel(World& world) {
+	world.clearParticleSystem();
+	world.objects.clear();
+	world.cameras.clear();
+	world.missiles.clear();
+	world.clearPhysObj();
+	AssetManager::clearCache();
+	world.currentCamera = nullptr;
+	for (auto& camera : world.cameras) {
+		if (camera->chase) {
+			camera->chaseObject = nullptr;
 		}
 	}
 }

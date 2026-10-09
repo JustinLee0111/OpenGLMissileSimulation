@@ -113,7 +113,7 @@ void PhysicsEngine::positionUpdater(float hitTime) {
 			object->position += worldSpaceVel * hitTime;
 		}
 
-		glm::vec3 angVel = object->physicsProperties->angularVelocity;
+		glm::vec3 angVel = object->rotationQ * object->physicsProperties->angularVelocity;
 		float rotateAngle = glm::length(angVel) * hitTime;
 		if (rotateAngle > 0.0f) {
 			object->rotate(glm::normalize(angVel), glm::degrees(rotateAngle));

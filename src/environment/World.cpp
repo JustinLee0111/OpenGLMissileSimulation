@@ -33,7 +33,7 @@ void World::worldInit() {
 
 	flareBucket = std::make_unique<Flares>();
 
-	loadLevel("assets/levels/MissileSim.json"); // Load default level
+	loadLevel(0); // Load default level
 
 	missiles[0]->findRandomTarget(*this);
 }
@@ -72,31 +72,15 @@ Missile* World::spawnMissile(const std::string& filepath) {
 	return ptr;
 }
 
-void World::loadLevel(const std::string& filepath) {
-	LevelManager::loadLevel(filepath, *this);
-	if (!missiles.empty()) {
-		for (auto& camera : cameras) {
-			if (camera->chase) {
-				camera->chaseObject = missiles[0];
+void World::loadLevel(int levelIndex) {
+	if (LevelManager::loadLevel(levelIndex, *this) == 0) {
+		if (!missiles.empty()) {
+			for (auto& camera : cameras) {
+				if (camera->chase) {
+					camera->chaseObject = missiles[0];
+				}
 			}
-		}
-		missiles[0]->findRandomTarget(*this);
-	}
-}
-
-// Doesn't unload world lights
-void World::unloadLevel() {
-	particleSystem.stopEmitting(particleBuckets);
-	particleSystem.clearEmittingObjs(particleBuckets);
-	objects.clear();
-	cameras.clear();
-	missiles.clear();
-	physicsEngine.physObjects.clear();
-	AssetManager::clearCache();
-	currentCamera = nullptr;
-	for (auto& camera : cameras) {
-		if (camera->chase) {
-			camera->chaseObject = nullptr;
+			missiles[0]->findRandomTarget(*this);
 		}
 	}
 }
