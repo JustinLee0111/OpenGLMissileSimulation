@@ -111,16 +111,21 @@ void Application::runApp(){
 
 void Application::debugging() {
 	Debugging::drawWrapper(getAspectRatio());
+	if (world.objects.size() > 1) {
+		glm::vec4 velocityColor = glm::vec4{ 0.0f, 1.0f, 0.0f, 0.1f };
+		glm::vec3 velocityDebug = (glm::length(world.objects[1]->physicsProperties->velocity) > 0.0f) ? (world.objects[1]->physicsProperties->velocity) : world.objects[1]->front;
+		Debugging::cone(glm::radians(1.5f), glm::length(world.objects[1]->physicsProperties->velocity), world.objects[1]->position, velocityDebug, velocityColor); // Velocity
+	}
 	for (auto& missile : world.missiles) { // For quick debugging, will make cleaner
 		glm::vec4 gimbalColor = glm::vec4{ 1.0f, 1.0f, 1.0f, 0.05f };
 		Debugging::cone(missile->getSeeker().gimbalLimit, 5.0f, missile->position, missile->front, gimbalColor); // Gimbal limit visual
 
 		glm::vec4 aeroColor = glm::vec4{ 0.0f, 0.0f, 1.0f, 0.1f };
-		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->getAeroForce())), missile->position, missile->getAeroForce(), aeroColor); // Aero force
+		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->getAeroForce()))/4.0f, missile->position, missile->getAeroForce(), aeroColor); // Aero force
 
 		glm::vec4 velocityColor = glm::vec4{ 0.0f, 1.0f, 0.0f, 0.1f };
 		glm::vec3 velocityDebug = (glm::length(missile->physicsProperties->velocity) > 0.0f) ? (missile->physicsProperties->velocity) : missile->front; 
-		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->physicsProperties->velocity)), missile->position, velocityDebug, velocityColor); // Velocity
+		Debugging::cone(glm::radians(2.0f), glm::sqrt(glm::length(missile->physicsProperties->velocity))/4.0f, missile->position, velocityDebug, velocityColor); // Velocity
 
 		if (!missile->getSeeker().getSeekerOn()) { continue; }
 		glm::vec3 forward{ 0.0f, 0.0f, 1.0f };
@@ -204,9 +209,16 @@ void Application::processKeyBindings() {
 			}
 			if (inputs.isKeyPressed(GLFW_KEY_SPACE)) {
 				world.missiles[0]->engineOn = true;
+				world.missiles[0]->launchMissile();
 			}
 			if (inputs.isKeyPressed(GLFW_KEY_LEFT_SHIFT)) {
 				world.missiles[0]->findRandomTarget(world);
+			}
+			if (inputs.isKeyPressed(GLFW_KEY_Q)) {
+				world.missiles[0]->launchMissile();
+			}
+			if (inputs.isKeyPressed(GLFW_KEY_E)) {
+				world.missiles[0]->engineOn = true;
 			}
 		}
 		if (inputs.isKeyPressed(GLFW_KEY_1)) {
@@ -224,12 +236,6 @@ void Application::processKeyBindings() {
 	}
 
 	// Level loading keybinds
-	if (inputs.isKeyPressed(GLFW_KEY_L)) {
-		world.loadLevel(6);
-	}
-	if (inputs.isKeyPressed(GLFW_KEY_T)) {
-		world.loadLevel(7);
-	}
 	if (inputs.isKeyPressed(GLFW_KEY_M)) {
 		world.loadLevel(0);
 	}
@@ -243,10 +249,19 @@ void Application::processKeyBindings() {
 		world.loadLevel(3);
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_C)) {
-		world.loadLevel(5);
+		world.loadLevel(4);
 	}
 	if (inputs.isKeyPressed(GLFW_KEY_X)) {
-		world.loadLevel(4);
+		world.loadLevel(5);
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_Z)) {
+		world.loadLevel(6);
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_L)) {
+		world.loadLevel(7);
+	}
+	if (inputs.isKeyPressed(GLFW_KEY_T)) {
+		world.loadLevel(8);
 	}
 }
 

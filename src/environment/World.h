@@ -34,7 +34,7 @@ public:
 	std::vector<std::unique_ptr<ParticleBucket>> particleBuckets;
 	std::unique_ptr<Flares> flareBucket = nullptr;
 
-	float airDensity = 1.0f; // kg/m^3
+	float airDensity = 1.23f; // kg/m^3
 
 	float ambientTemp = 23.0f; // Temp in celcius
 

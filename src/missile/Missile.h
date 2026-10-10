@@ -50,8 +50,16 @@ class Missile : public Object {
 			return burnTimeRemaining;
 		}
 
+		const float getLift() const {
+			return liftForce;
+		}
+
 		void resetFuel() {
 			burnTimeRemaining = engineBurnTime;
+		}
+
+		void launchMissile() {
+			launched = true;
 		}
 
 		bool engineOn = false;
@@ -66,19 +74,29 @@ class Missile : public Object {
 		float engineBurnTime{ 5.0f }; // Burn time in seconds
 		float burnTimeRemaining{ engineBurnTime };
 
-		float wingSurfaceArea{ 0.15f }; // In m^2
-		float wingFrontSurfaceArea{ 0.025f }; // Frontal surface area for drag calculations, also in m^2
+		float wingSurfaceArea{ 0.95f }; // In m^2
+		float wingFrontSurfaceArea{ 0.2f }; // Frontal surface area for drag calculations, also in m^2
+		float aoaMultiplier{ 2.5f }; // Multiplier for aoa force generated to more match realistic lift
 		float speedMaxTurn{ 400.0f }; // The speed at which the missile has the best turn rate
+
+		float gLimit{ 60.0f };
+		float aoaLimitNoEngine{ 35.0f };
+		float aoaLimitEngine{ 50.0f };
+
+		float gLimitDampStart{ 45.0f };
+		float aoaNoEngineDampStart{ 30.0f };
+		float aoaEngineDampStart{ 45.0f };
 
 		float proxyTrigDist{ 5.0f }; // Distance from edge of missile to target edge for triggering proxy fuse
 		float explosionDamage{ 100.0f };
 		float explosionRadius{ 5.0f };
 
 		bool memoryTurnDamping{ false }; // Slows turn rate during memory flight
+		bool launched{ false };
 
 		glm::vec3 aeroForce{ 0.0f }; // Aero force in newtons
-		glm::vec3 engineThrust{0.0f, 0.0f, 150.0f}; // Thrust in newtons
+		glm::vec3 engineThrust{0.0f, 0.0f, 17000.0f}; // Thrust in newtons
 
-		// Variables for debugging/HUD
 		float missileAOA{ 0.0f };
+		float liftForce{ 0.0f }; // For g limiter
 };

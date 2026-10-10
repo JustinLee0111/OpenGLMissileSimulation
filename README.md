@@ -6,9 +6,9 @@
 
 **<u>Description:</u>**
 
-- Basic missile simulation using proportional navigation, combined with a custom physics simulator for bouncing sphere on sphere and sphere on bounded plane. Uses Continuous Collision Detection (CCD) to detect collisions.
+- Infrared missile simulation using proportional navigation inspired by the AIM-9X sidewinder, combined with a custom physics simulator for bouncing sphere on sphere and sphere on bounded plane. Uses Continuous Collision Detection (CCD) to detect collisions.
 - Missile proportional navigation (pronav) uses tuned properties to achieve optimal interception of target, examples are setting the correct gain for pronav and missile turn rate to achieve the optimal flight path angle.
-- Proportional navigation achieves collision with target once line of sight rate (LOS rate) is zero or near zero, great resources exist such as Ben Dickinson on YouTube or Basic Principles of Homing Guidance by Neil F. Palumbo, Ross A. Blauwkamp,
+- Proportional navigation achieves collision with target once line of sight rate (LOS rate) is zero or near zero, resources exist such as Ben Dickinson on YouTube or Basic Principles of Homing Guidance by Neil F. Palumbo, Ross A. Blauwkamp,
 and Justin M. Lloyd.
 - The benefit of CCD is the ability to prevent high-speed tunneling (objects passing through one another) and calculating precise collisions.
 - The biggest challenge of CCD is calculating the Time of Impact (TOI). Two methods used is Analytical and Conservative Advancement.
@@ -43,21 +43,15 @@ and Justin M. Lloyd.
 - Working missile simulation using proportional navigation with an engine and proxy fuse
 - Infrared Counter Counter Measures (IRCCM) utilizing Two-color, Spatial Gating, and Memory
 - Flares for targets
+- Missile aerodynamics
 - AoA Limiter
+- G-Limiter
 - Continuous Collision Detection solver with both conservative advancement and analytical Time of Impact (TOI) solver
 - Bounded plane collisions with dynamic normals for edge collisions (only for sphere and plane collisions)
 - Working particle system for missile and explosion
 - Sphere on sphere collisions using impulses
 - Dynamic level loading with JSON level data
 - Seeker object tracking with gimbal limits
-
-**<u>Currently:</u>**
-
-Missile simulation with IRCCM and flares. Includes a CCD sphere and bounded plane physics simulator.
-
-**<u>Endgoal:</u>**
-
-A basic lightweight missile simulation using OpenGL. Simulates infrared target tracking, simplified aerodynamics, IRCCM, thrust vectoring, and proximity fuse.
 
 **<u>Requirements</u>**
 
@@ -66,3 +60,6 @@ A basic lightweight missile simulation using OpenGL. Simulates infrared target t
 - OpenGL 4.6
 
 - Visual Studio 2022+ (Desktop Dev w/ C++)
+
+**<u>Resources Used</u>**
+- AIM-9 sidewinder model from Patar on blendswap.com

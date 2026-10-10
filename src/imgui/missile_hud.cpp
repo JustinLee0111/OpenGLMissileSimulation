@@ -30,7 +30,7 @@ void MissileHud::MissileHUD(std::vector<Missile*>& missiles)
         ImGui::Separator();
         if (!missiles.empty()) {
             ImGui::Text("Speed: %.1f m/s", glm::length(missiles[0]->physicsProperties->velocity));
-            ImGui::Text("GForce: %.1f G", (glm::length(missiles[0]->physicsProperties->angularVelocity) * glm::length(missiles[0]->physicsProperties->velocity)) / 9.81f);
+            ImGui::Text("GForce: %.1f G", missiles[0]->getLift() / (missiles[0]->physicsProperties->mass * 9.81f));
             ImGui::Text("Angle of Attack (deg): %.5f", glm::degrees(missiles[0]->getAOA()));
             ImGui::Text("Fuel Remaining (sec): %.1f", missiles[0]->getFuelTimeLeft());
             if (missiles[0]->engineOn) {

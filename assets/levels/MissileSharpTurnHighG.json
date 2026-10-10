@@ -2,11 +2,11 @@
   "levelName": "MissileSim",
   "cameras": [
     {
-      "cameraName": "mainCamera",
-      "position": [ 0.0, 2.0, 50.0 ],
-      "yaw": -85.0,
-      "chase":  true,
-      "pitch" : -5.0
+      "cameraName": "chaseCamera",
+      "chase": true,
+      "position": [ 0.0, 0.0, 0.0 ],
+      "yaw": -130.0,
+      "pitch": -5.0
     }
   ],
   "objects": [
@@ -14,8 +14,8 @@
       "objectName": "missile",
       "modelPath": "assets/models/trainingAIM9L.obj",
       "gravity": true,
-      "position": [ 0.0, 50.0, 0.0 ],
-      "velocity": [ 0.0, 0.0, 172.0 ],
+      "position": [ 0.0, 100.0, 0.0 ],
+      "velocity": [ 0.0, 0.0, 250.0 ],
       "color": [ 0.9, 0.9, 0.9, 1.0 ],
       "mass": 86.0,
       "collider": "Sphere",
@@ -28,10 +28,10 @@
     {
       "objectName": "target",
       "modelPath": "assets/models/sphere.obj",
-      "velocity": [ 250.0, 2.0, 0.0 ],
+      "velocity": [ -300.0, 0.0, 0.0 ],
       "gravity": false,
       "isStatic" : false,
-      "position": [ 2000.0, 50.0, 0.0 ],
+      "position": [ 1500.0, 100.0, 400.0 ],
       "collider": "Sphere",
       "restitution": 0.5
     }

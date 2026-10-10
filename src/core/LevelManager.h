@@ -11,11 +11,13 @@ public:
 		{0, "assets/levels/MissileSim.json"},
 		{1, "assets/levels/MissileTailing.json"},
 		{2, "assets/levels/MissileSharpTurn.json"},
-		{3, "assets/levels/MissileSimStill.json"},
-		{4, "assets/levels/SideAspect.json"},
-		{5, "assets/levels/ChaseCamTest.json"},
-		{6, "assets/levels/PhysicsSimWorldData.json"},
-		{7, "assets/levels/PhysicsTesting.json"}
+		{3, "assets/levels/MissileSharpTurnHighG.json"},
+		{4, "assets/levels/MissileSimStill.json"},
+		{5, "assets/levels/SideAspect.json"},
+		{6, "assets/levels/ChaseCamTest.json"},
+		{7, "assets/levels/PhysicsSimWorldData.json"},
+		{8, "assets/levels/PhysicsTesting.json"},
+
 	};
 
 	static inline int currentLevel{ -1 };

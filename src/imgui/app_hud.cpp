@@ -35,7 +35,7 @@ void AppHUD::ShowAppHUD(Application& app, World& world)
         ImGui::Text("Frames Per Second: %.2f", 1000.0f / (app.getFrametime() * 1000.0f));
         ImGui::Text("Frametime: %.2f ms", app.getFrametime() * 1000);
 
-            const char* items[] = { "Missile Sim Main", "Missile Tailing", "Missile Sharp Turn", "Still Missile", "Side Aspect", "Chase Cam Test", "Physics Sim", "Physics Sim Moving Platform" };
+            const char* items[] = { "Missile Sim Main", "Missile Tailing", "Missile Sharp Turn", "Missile Sharp Turn (High G)", "Still Missile", "Side Aspect", "Chase Cam Test", "Physics Sim", "Physics Sim Moving Platform" };
 
             AppHUD::item_selected_idx = LevelManager::currentLevel;
             // Pass in the preview value visible before opening the combo (it could technically be different contents or not pulled from items[])
@@ -74,16 +74,18 @@ void AppHUD::ShowAppHUD(Application& app, World& world)
                 ImGui::Text("A: Add 10 m/s left");
                 ImGui::Text("D: Add 10 m/s right");
                 ImGui::Text("Left Alt: Lock/Unlock camera");
-                ImGui::Text("Space: Turn engine on");
+                ImGui::Text("Space: Launch Missile");
                 ImGui::Text("Left Shift: Lock target");
-                ImGui::Text("F: Target drops flare");
-                ImGui::Text("R: Enable/Disable seeker");
-                ImGui::Text("Y: Add force up to target");
-                ImGui::Text("H: Add force down to target");
                 ImGui::Text("Up Arrow: Pitch missile up");
                 ImGui::Text("Down Arrow: Pitch missile down");
                 ImGui::Text("Left Arrow: Turn missile left");
                 ImGui::Text("Right Arrow: Turn missile right");
+                ImGui::Text("F: Target drops flare");
+                ImGui::Text("R: Enable/Disable seeker");
+                ImGui::Text("E: Enable Engine");
+                ImGui::Text("Q: Start Tracking");
+                ImGui::Text("Y: Add force up to target");
+                ImGui::Text("H: Add force down to target");
 
                 ImGui::TreePop();
             }

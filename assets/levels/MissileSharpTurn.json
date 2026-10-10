@@ -13,9 +13,10 @@
       "objectName": "missile",
       "modelPath": "assets/models/trainingAIM9L.obj",
       "gravity": true,
-      "position": [ -10.0, -50.0, 0.0 ],
+      "position": [ -300.0, -100.0, -300.0 ],
       "velocity": [ 0.0, 0.0, 300.0 ],
       "color": [ 0.9, 0.9, 0.9, 1.0 ],
+      "mass": 86.0,
       "collider": "Sphere",
       "restitution": 0.5,
       "rotation": {
@@ -29,7 +30,7 @@
       "velocity": [ -50.0, 1.0, 3.0 ],
       "gravity": false,
       "isStatic" : false,
-      "position": [ 70.0, 30.0, 0.0 ],
+      "position": [ 70.0, 100.0, -300.0 ],
       "collider": "Sphere",
       "restitution": 0.5
     }
